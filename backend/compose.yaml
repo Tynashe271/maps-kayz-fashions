@@ -1,0 +1,106 @@
+name: polyglot-services
+
+services:
+  postgres:
+    image: docker.io/library/postgres:16-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+
+  redis:
+    image: docker.io/library/redis:7-alpine
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  commerce-api:
+    build:
+      context: .
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://app:app@postgres:5432/app
+      JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-me}
+      WHATSAPP_ORDER_NUMBER: ${WHATSAPP_ORDER_NUMBER:-}
+    ports: ["3000:3000"]
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  express-api:
+    build:
+      context: ./services/express-api
+    environment:
+      PORT: 3001
+      PYTHON_SERVICE_URL: http://python-api:8000
+      SPRING_SERVICE_URL: http://spring-api:8080
+      GO_SERVICE_URL: http://go-api:8081
+    ports: ["3001:3001"]
+    depends_on:
+      python-api: { condition: service_healthy }
+      spring-api: { condition: service_healthy }
+      go-api: { condition: service_healthy }
+
+  go-api:
+    build:
+      context: ./services/go-api
+    environment:
+      PORT: 8081
+    ports: ["8081:8081"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8081/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  spring-api:
+    build:
+      context: ./services/spring-api
+    environment:
+      SERVER_PORT: 8080
+    ports: ["8080:8080"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  python-api:
+    build:
+      context: ./services/python-api
+    environment:
+      DATABASE_URL: postgresql+psycopg://app:app@postgres:5432/app
+    ports: ["8000:8000"]
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  sidekiq-worker:
+    build:
+      context: ./services/sidekiq-worker
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      redis: { condition: service_healthy }
+
+volumes:
+  postgres-data:

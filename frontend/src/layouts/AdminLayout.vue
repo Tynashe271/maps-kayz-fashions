@@ -1,0 +1,54 @@
+<script setup>
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { authStore, roleLabels, clearSession } from '../lib/auth'
+
+const router = useRouter()
+const route = useRoute()
+const showBackButton = computed(() => route.name !== 'admin-dashboard')
+
+const links = [
+  { to: '/', label: 'Dashboard', exact: true },
+  { to: '/products', label: 'Products' },
+  { to: '/categories', label: 'Categories' },
+  { to: '/customers', label: 'Customers' },
+  { to: '/orders', label: 'Orders' },
+  { to: '/promotions', label: 'Promotions' },
+  { to: '/inventory', label: 'Inventory' },
+  { to: '/deliveries', label: 'Deliveries' },
+  { to: '/returns', label: 'Returns' },
+  { to: '/platform', label: 'Customer activity' },
+]
+
+function logout() {
+  clearSession()
+  router.replace({ name: 'admin-login' })
+}
+
+function goBack() {
+  if (window.history.length > 1) router.back()
+  else router.push('/')
+}
+</script>
+
+<template>
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <router-link class="admin-brand" to="/"><img src="/admin-logo-mark.svg" alt="Maps Kayz Admin" width="42" height="42" /><span>MAPS KAYZ<small>ADMINISTRATION</small></span></router-link>
+      <nav>
+        <router-link v-for="link in links" :key="link.to" :to="link.to" :class="{ active: link.exact ? $route.path === link.to : $route.path.startsWith(link.to) }">{{ link.label }}</router-link>
+      </nav>
+      <a class="admin-view-store" href="http://localhost:9990/">&larr; View storefront</a>
+    </aside>
+    <div class="admin-body">
+      <header class="admin-topbar">
+        <div v-if="authStore.user"><strong>{{ authStore.user.email }}</strong><span>{{ roleLabels[authStore.user.role] ?? authStore.user.role }}</span></div>
+        <button type="button" class="btn btn-ghost" @click="logout">Logout</button>
+      </header>
+      <main class="admin-main">
+        <button v-if="showBackButton" type="button" class="page-back-button admin-back-button" @click="goBack"><span>&larr;</span> Back</button>
+        <router-view />
+      </main>
+    </div>
+  </div>
+</template>

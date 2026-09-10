@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Maps Kayz Admin">
+  <defs><linearGradient id="a" x1="20" y1="12" x2="142" y2="150" gradientUnits="userSpaceOnUse"><stop stop-color="#f8c6d8"/><stop offset="1" stop-color="#e58aaf"/></linearGradient></defs>
+  <path d="M80 5 145 29v48c0 39-24 65-65 78C39 142 15 116 15 77V29L80 5Z" fill="#0b0a08" stroke="url(#a)" stroke-width="3"/>
+  <path d="M31 42h98M31 118h98" stroke="#f2a8c4" stroke-width="1" opacity=".28"/>
+  <path d="M48 108V51h10l22 33 22-33h10v57h-12V72L80 101 60 72v36H48Z" fill="#f7f2ea"/>
+  <circle cx="80" cy="26" r="4" fill="#f2a8c4"/>
+  <text x="80" y="136" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" font-weight="700" letter-spacing="3" fill="#f2a8c4">ADMIN</text>
+</svg>

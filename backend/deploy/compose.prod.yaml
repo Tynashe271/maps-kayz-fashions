@@ -1,0 +1,59 @@
+name: mapskayz
+
+# Production stack for the DigitalOcean Ubuntu VPS, run with Podman Compose.
+# Nginx and Let's Encrypt live on the HOST (installed via apt), not in here —
+# see deploy/nginx/mapskayz-api.conf. This stack only needs to expose the API
+# to localhost; Nginx terminates TLS and proxies to it.
+#
+# Usage on the VPS (see ../../DEPLOYMENT.md for the full runbook):
+#   cd /opt/mapskayz && podman-compose -f compose.prod.yaml --env-file .env.prod pull
+#   podman-compose -f compose.prod.yaml --env-file .env.prod up -d
+
+services:
+  db:
+    image: docker.io/library/postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - mapskayz-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Not published to the host — only the api service on the same Podman
+    # network can reach it. Add "ports: ['5432:5432']" temporarily if you
+    # need to connect a local psql client directly for debugging.
+
+  api:
+    image: ${CI_REGISTRY_IMAGE:-registry.gitlab.com/your-namespace/your-project}/backend:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 9200
+      # Set directly in .env.prod rather than built up here from the db
+      # service's own vars — podman-compose's variable substitution doesn't
+      # reliably support nesting "${A}" inside another "${B:-default}". If
+      # you're using the bundled "db" service below, just make this match
+      # its POSTGRES_USER/PASSWORD/DB (see .env.prod.example). Pointing this
+      # at a managed Postgres instance instead? Set it to that connection
+      # string and don't start the "db" service.
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      WHATSAPP_ORDER_NUMBER: ${WHATSAPP_ORDER_NUMBER}
+      PAYMENT_WEBHOOK_SECRET: ${PAYMENT_WEBHOOK_SECRET}
+      WHATSAPP_WEBHOOK_SECRET: ${WHATSAPP_WEBHOOK_SECRET}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+    ports:
+      # Bound to loopback only — Nginx on the host is the only thing that
+      # should be reachable from the internet. Don't change to "9200:9200".
+      - 127.0.0.1:9200:9200
+
+volumes:
+  mapskayz-pgdata:

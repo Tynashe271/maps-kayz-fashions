@@ -1,0 +1,7 @@
+FROM docker.io/library/ruby:3.4-alpine
+RUN apk add --no-cache build-base
+WORKDIR /app
+COPY Gemfile .
+RUN bundle install
+COPY . .
+CMD ["bundle", "exec", "sidekiq", "-r", "./config/boot.rb", "-C", "config/sidekiq.yml"]

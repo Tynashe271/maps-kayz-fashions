@@ -1,0 +1,27 @@
+FROM docker.io/library/node:22-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY nest-cli.json tsconfig*.json ./
+COPY src ./src
+RUN npm run build
+
+FROM docker.io/library/node:22-alpine
+ENV NODE_ENV=production
+# Matches src/main.ts's own default (process.env.PORT ?? 9200) — compose.yaml
+# files can still override PORT at runtime, which always wins over this.
+ENV PORT=9200
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY --from=build /app/dist ./dist
+EXPOSE 9200
+# GitLab CI builds this with Docker (docker:27 + dind, see .gitlab-ci.yml),
+# which keeps HEALTHCHECK; podman then honors it fine when it later pulls and
+# runs that image on the VPS. Building locally with plain `podman build`
+# instead defaults to OCI format and silently drops it — add `--format
+# docker` to that command if you want to see it in a local test build.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD wget -q --spider http://localhost:${PORT}/api/health || exit 1
+USER node
+CMD ["npm", "start"]

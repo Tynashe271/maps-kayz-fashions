@@ -1,0 +1,18 @@
+{
+  "name": "maps-kayz-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-vue": "latest",
+    "three": "^0.186.0",
+    "vite": "latest",
+    "vue": "latest",
+    "vue-router": "^4.6.4"
+  }
+}

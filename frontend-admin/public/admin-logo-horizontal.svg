@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 150" role="img" aria-label="Maps Kayz Administration">
+  <defs><linearGradient id="a" x1="10" y1="5" x2="140" y2="145" gradientUnits="userSpaceOnUse"><stop stop-color="#f8c6d8"/><stop offset="1" stop-color="#e58aaf"/></linearGradient></defs>
+  <path d="M75 5 137 28v46c0 37-23 62-62 74C36 136 13 111 13 74V28L75 5Z" fill="#0b0a08" stroke="url(#a)" stroke-width="3"/>
+  <path d="M44 102V49h10l21 31 21-31h10v53H95V69L75 96 55 69v33H44Z" fill="#f7f2ea"/>
+  <circle cx="75" cy="25" r="4" fill="#f2a8c4"/>
+  <text x="170" y="72" font-family="Georgia,serif" font-size="38" letter-spacing="3" fill="#f7f2ea">MAPS KAYZ</text>
+  <path d="M171 88h375" stroke="#f2a8c4" opacity=".38"/>
+  <text x="171" y="112" font-family="Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="5" fill="#f2a8c4">ADMINISTRATION</text>
+</svg>
