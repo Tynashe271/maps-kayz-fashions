@@ -127,11 +127,17 @@ To change the API URL, add a custom domain, or edit any of the above later:
 this project's **Settings** tab. Every push to `master` auto-deploys, same
 as Render — no GitHub Actions involved here either.
 
-(Recommended, not yet done) Put this project behind
+**Cloudflare Access — tried, skipped**: putting this project behind
 [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
-so the admin panel isn't reachable by anyone who just guesses the URL —
-it's a second layer in front of the app's own staff login, not a
-replacement for it.
+as a second layer in front of the app's own staff login would be nice, but
+Cloudflare requires a payment method on file to activate Zero Trust even on
+its **free** ($0/month) plan — same wall this project hit with DigitalOcean
+and Google Cloud earlier, so it's parked rather than done. The admin app's
+own JWT-based staff login is the real access gate in the meantime. To pick
+this back up: Cloudflare dashboard > Zero Trust > add a payment method >
+Access > Applications > Add an application > Self-hosted > domain
+`maps-kayz-admin.pages.dev` > a policy allowing only the staff emails that
+should reach it.
 
 **Gotcha if this project is ever recreated from scratch**: `frontend-admin`
 shares code with `frontend` via a `@store` Vite alias into `../frontend/src`
@@ -145,14 +151,17 @@ Fixed by a `postinstall` script in `frontend-admin/package.json` that also
 runs `npm install` in `../frontend` — already committed, nothing to redo,
 but worth knowing if this ever needs debugging again.
 
-## 5. Close the loop: lock down CORS
+## 5. CORS (already done)
 
-Now that both frontend URLs exist, go to the Render service's **Environment**
-tab and set `CORS_ORIGINS` to both, comma-separated, e.g.:
+Render's **Environment** tab has `CORS_ORIGINS` set to both frontend
+origins, comma-separated:
 ```
 https://tynashe271.github.io,https://maps-kayz-admin.pages.dev
 ```
-Saving it triggers an automatic redeploy — no extra step needed.
+Editing it there triggers an automatic redeploy — no extra step needed. If
+a custom domain ever replaces either `*.pages.dev`/`*.github.io` origin,
+add it here too (comma-separated, no trailing slash) or that frontend will
+start getting CORS errors.
 
 ## Day-to-day operations
 
