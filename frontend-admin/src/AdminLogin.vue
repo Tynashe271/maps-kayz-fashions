@@ -5,6 +5,7 @@ import { api } from '@store/lib/api'
 import { setSession } from '@store/lib/auth'
 
 const router = useRouter()
+const storefrontUrl = import.meta.env.VITE_STOREFRONT_URL ?? 'http://localhost:9990'
 const email = ref('')
 const password = ref('')
 const busy = ref(false)
@@ -41,7 +42,7 @@ async function login() {
       </a>
       <div class="admin-welcome-nav-right">
         <span><i></i> Systems online</span>
-        <a href="http://localhost:9990">View customer shop ↗</a>
+        <a :href="storefrontUrl">View customer shop ↗</a>
       </div>
     </header>
 
