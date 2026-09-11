@@ -1,6 +1,6 @@
 # Maps Kayz Customer App
 
-React Native customer app built with Expo. It connects to the existing Maps Kayz NestJS API and does not use Flutter.
+React Native customer app built with Expo. It runs the production customer storefront inside a native application shell and does not use Flutter.
 
 ## Run locally
 
@@ -15,15 +15,8 @@ The production API is the default. To use a different API, copy `.env.example` t
 
 ## Included flows
 
-- Home and store benefits
-- Live product catalogue and search
-- Backend-backed shopping cart
-- WhatsApp ordering
-- Customer registration and login
-- Customer dashboard summary and logout
-- In-app access to all storefront features: categories, product details,
-  checkout, payment, tracking, returns, wishlist, saved looks, style profile,
-  loyalty, coupons, store credit, addresses, notifications, reviews,
-  referrals, support, profile and security
-- Native login is passed securely into the in-app storefront session
-- Android and iOS identifiers
+The app uses the customer website as its single source of truth. Every website
+screen, action, account section and navigation sequence therefore appears in
+the app in exactly the same order. Login and cart state persist in the embedded
+storefront. Android's back button and iOS back gestures follow browser history;
+external WhatsApp and payment links open in their appropriate installed apps.
