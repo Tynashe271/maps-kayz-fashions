@@ -29,7 +29,7 @@ services:
     # need to connect a local psql client directly for debugging.
 
   api:
-    image: ${CI_REGISTRY_IMAGE:-registry.gitlab.com/your-namespace/your-project}/backend:${IMAGE_TAG:-latest}
+    image: ${REGISTRY_IMAGE:-ghcr.io/your-github-username/your-repo/backend}:${IMAGE_TAG:-latest}
     restart: unless-stopped
     depends_on:
       db:

@@ -16,8 +16,9 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
 EXPOSE 9200
-# GitLab CI builds this with Docker (docker:27 + dind, see .gitlab-ci.yml),
-# which keeps HEALTHCHECK; podman then honors it fine when it later pulls and
+# GitHub Actions builds this with real Docker (see
+# .github/workflows/deploy-backend.yml), which keeps HEALTHCHECK; podman then
+# honors it fine when it later pulls and
 # runs that image on the VPS. Building locally with plain `podman build`
 # instead defaults to OCI format and silently drops it — add `--format
 # docker` to that command if you want to see it in a local test build.

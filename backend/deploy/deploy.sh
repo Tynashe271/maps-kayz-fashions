@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Pulls the latest backend image from the GitLab Container Registry and
+# Pulls the latest backend image from the GitHub Container Registry and
 # restarts the production stack. Run this ON THE VPS, either by hand or via
-# the GitLab CI/CD "deploy" job over SSH (see .gitlab-ci.yml).
+# the "deploy" job in .github/workflows/deploy-backend.yml over SSH.
 #
 # Expects to live at /opt/mapskayz/deploy.sh alongside compose.prod.yaml and
 # .env.prod (see DEPLOYMENT.md for first-time setup).
@@ -14,21 +14,22 @@ if [ ! -f .env.prod ]; then
   exit 1
 fi
 
-echo "==> Logging in to the GitLab Container Registry"
-# CI_REGISTRY / CI_REGISTRY_USER / CI_REGISTRY_PASSWORD are passed in by the
-# CI/CD job. For a manual run, export them yourself first (a deploy token or
-# personal access token with read_registry scope works for CI_REGISTRY_PASSWORD).
-podman login "${CI_REGISTRY:-registry.gitlab.com}" \
-  --username "${CI_REGISTRY_USER:?set CI_REGISTRY_USER}" \
-  --password-stdin <<<"${CI_REGISTRY_PASSWORD:?set CI_REGISTRY_PASSWORD}"
+echo "==> Logging in to the GitHub Container Registry"
+# REGISTRY / REGISTRY_USER / REGISTRY_PASSWORD are passed in by the deploy
+# workflow (REGISTRY_PASSWORD is that job's GITHUB_TOKEN — it's only used
+# here, immediately, not stored). For a manual run, export them yourself
+# first (a classic PAT with read:packages scope works for REGISTRY_PASSWORD).
+podman login "${REGISTRY:-ghcr.io}" \
+  --username "${REGISTRY_USER:?set REGISTRY_USER}" \
+  --password-stdin <<<"${REGISTRY_PASSWORD:?set REGISTRY_PASSWORD}"
 
 echo "==> Pulling the latest image"
-CI_REGISTRY_IMAGE="${CI_REGISTRY_IMAGE:?set CI_REGISTRY_IMAGE}" \
+REGISTRY_IMAGE="${REGISTRY_IMAGE:?set REGISTRY_IMAGE}" \
 IMAGE_TAG="${IMAGE_TAG:-latest}" \
 podman-compose -f compose.prod.yaml --env-file .env.prod pull api
 
 echo "==> Restarting the stack"
-CI_REGISTRY_IMAGE="${CI_REGISTRY_IMAGE}" \
+REGISTRY_IMAGE="${REGISTRY_IMAGE}" \
 IMAGE_TAG="${IMAGE_TAG:-latest}" \
 podman-compose -f compose.prod.yaml --env-file .env.prod up -d
 

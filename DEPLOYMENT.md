@@ -4,12 +4,12 @@ Target architecture:
 
 ```mermaid
 flowchart LR
-    subgraph GitLab
-      CI[GitLab CI/CD]
-      CR[Container Registry]
+    subgraph GitHub
+      CI[GitHub Actions]
+      CR[Container Registry\nghcr.io]
     end
     subgraph Static hosting
-      SF[Storefront\nGitLab Pages]
+      SF[Storefront\nGitHub Pages]
       AD[Admin app\nCloudflare Pages]
     end
     subgraph "DigitalOcean Ubuntu VPS"
@@ -29,21 +29,23 @@ flowchart LR
 ```
 
 Backend and its Postgres database live on one VPS behind Nginx, built and
-deployed automatically by GitLab CI/CD. Both frontends are static builds — the
-customer storefront ships via GitLab Pages, the admin app via its own
+deployed automatically by GitHub Actions. Both frontends are static builds —
+the customer storefront ships via GitHub Pages, the admin app via its own
 Cloudflare Pages project (kept separate so it can sit behind its own access
 controls and isn't crammed into the storefront's Pages deployment).
 
 Everything below is config-as-code already committed in this repo
-(`backend/deploy/`, `.gitlab-ci.yml`) — this doc is the runbook for the manual,
-one-time setup steps (provisioning, DNS, secrets) that only a human with
-DigitalOcean/GitLab/Cloudflare access can do.
+(`backend/deploy/`, `.github/workflows/`) — this doc is the runbook for the
+manual, one-time setup steps (provisioning, DNS, secrets) that only a human
+with DigitalOcean/GitHub/Cloudflare access can do.
 
 ## 0. Prerequisites
 
-- A DigitalOcean account and a domain you control (e.g. `mapskayz.com`).
-- This project pushed to a GitLab project, with the **Container Registry**
-  enabled (Settings > Packages and registries > Container Registry).
+- A DigitalOcean account (with a payment method on file) and a domain you
+  control (e.g. `mapskayz.com`).
+- This project pushed to a GitHub repository (public or private — GitHub
+  Container Registry and GitHub Pages both work on private repos on the free
+  plan).
 - A Cloudflare account (free tier is fine) if you're using Cloudflare Pages
   for the admin app.
 
@@ -109,22 +111,28 @@ chmod 600 /opt/mapskayz/.env.prod
 nano /opt/mapskayz/.env.prod   # fill in real values — see the comments in the file
 ```
 
-Log in to the registry once by hand (a
-[deploy token](https://docs.gitlab.com/user/project/deploy_tokens/) with
-`read_registry` scope works well here, or a personal access token with
-`read_registry`), then bring the stack up:
+Log in to the registry once by hand — a
+[classic Personal Access Token](https://github.com/settings/tokens) with the
+`read:packages` scope works for this (a fine-grained token scoped to just
+this repo's "Contents: read" + package access also works, but the package
+permission model for fine-grained tokens is newer/less predictable — classic
+is the safe default here) — then bring the stack up:
 
 ```sh
-podman login registry.gitlab.com
+podman login ghcr.io -u your-github-username
 cd /opt/mapskayz
-CI_REGISTRY_IMAGE=registry.gitlab.com/your-namespace/your-project \
+REGISTRY_IMAGE=ghcr.io/your-github-username/your-repo/backend \
 IMAGE_TAG=latest \
 podman-compose -f compose.prod.yaml --env-file .env.prod up -d
 curl http://127.0.0.1:9200/api/health
 ```
 
 (If `compose.prod.yaml` can't pull the image yet because CI hasn't built one,
-push to GitLab first so `build-backend` runs, then come back to this step.)
+push to GitHub first so the `build` job in `deploy-backend.yml` runs, then
+come back to this step. Also make sure the package's visibility allows your
+account to pull it — a package inherits the repo's visibility by default, so
+a private repo means a private package, which your own login can always
+pull.)
 
 **Schema migrations**: local dev (sqlite) creates its schema automatically
 via TypeORM's `synchronize: true`, which is deliberately *disabled* in
@@ -143,44 +151,53 @@ DATABASE_URL=postgresql://mapskayz:<password>@localhost:5432/mapskayz \
 schema already applied — not directly at production — then review the
 generated SQL before committing it, same as reviewing any other diff).
 
-## 5. Wire up GitLab CI/CD
+## 5. Wire up GitHub Actions
 
 1. Generate a dedicated deploy keypair (don't reuse your personal one):
    ```sh
-   ssh-keygen -t ed25519 -C "gitlab-deploy" -f gitlab-deploy-key -N ""
+   ssh-keygen -t ed25519 -C "github-actions-deploy" -f github-deploy-key -N ""
    ```
 2. On the VPS, add the **public** key to the deploy user:
    ```sh
-   cat gitlab-deploy-key.pub >> ~/.ssh/authorized_keys
+   cat github-deploy-key.pub >> ~/.ssh/authorized_keys
    ```
-3. In GitLab: Settings > CI/CD > Variables, add:
-   | Key | Value | Flags |
-   |---|---|---|
-   | `SSH_PRIVATE_KEY` | contents of `gitlab-deploy-key` (the private half) | Protected, Masked, File-type off |
-   | `DEPLOY_HOST` | droplet IP or hostname | Protected |
-   | `DEPLOY_USER` | `mapskayz-deploy` | Protected |
+3. In the GitHub repo: Settings > Secrets and variables > Actions > New
+   repository secret, add:
+   | Name | Value |
+   |---|---|
+   | `SSH_PRIVATE_KEY` | contents of `github-deploy-key` (the private half) |
+   | `DEPLOY_HOST` | droplet IP or hostname |
+   | `DEPLOY_USER` | `mapskayz-deploy` |
 
-   `CI_REGISTRY`, `CI_REGISTRY_USER`, `CI_REGISTRY_PASSWORD`, and
-   `CI_REGISTRY_IMAGE` are already provided by GitLab automatically.
-4. Mark your default branch (`main`) as **Protected** (Settings > Repository >
-   Protected branches) so those Protected variables are available to its
-   pipeline.
-5. Push to `main`. `build-backend` builds and pushes the image;
-   `deploy-backend` then SSHes in and runs `/opt/mapskayz/deploy.sh`, which
-   pulls that image and restarts the stack.
+   `GITHUB_TOKEN` is provided automatically by Actions for each run — no
+   setup needed for registry auth.
+4. Push to `master` with changes under `backend/`. The `build` job in
+   `deploy-backend.yml` builds and pushes the image to `ghcr.io`; `deploy`
+   then SSHes in and runs `/opt/mapskayz/deploy.sh`, which pulls that image
+   and restarts the stack.
+5. First time only: the pushed package may default to **private** visibility
+   linked to the repo, which is fine (the VPS logs in with a real account),
+   but confirm under the repo's "Packages" tab (right sidebar) that the
+   `backend` package exists and is linked to this repository.
 
-## 6. Deploy the storefront (GitLab Pages)
+## 6. Deploy the storefront (GitHub Pages)
 
-1. In GitLab: Settings > CI/CD > Variables, add `VITE_API_BASE_URL` =
-   `https://api.yourdomain.com` (used by the `pages` job in `.gitlab-ci.yml`).
-2. Push to `main` — the `pages` job builds `frontend/` and publishes it.
-3. Settings > Pages > New Domain to attach `mapskayz.com` (or `www.`), and
-   follow GitLab's instructions for the DNS record + verification.
+1. Settings > Pages > Build and deployment > Source: **GitHub Actions**
+   (one-time toggle — without this the `deploy-pages.yml` workflow has
+   nothing to deploy to).
+2. (Optional) Settings > Secrets and variables > Actions > Variables tab
+   (not Secrets — this one isn't sensitive) > New repository variable:
+   `VITE_API_BASE_URL` = `https://api.yourdomain.com`.
+3. Push to `master` with changes under `frontend/` — the workflow builds it
+   and publishes via Pages.
+4. Settings > Pages > Custom domain to attach `mapskayz.com` (or `www.`),
+   and follow GitHub's instructions for the DNS record + verification.
 
 ## 7. Deploy the admin app (Cloudflare Pages)
 
 1. Cloudflare dashboard > Workers & Pages > Create > Pages > connect your
-   GitLab repo.
+   GitHub repo (authorize the Cloudflare GitHub App for it if this is the
+   first project you're linking).
 2. Build settings:
    - **Root directory**: `frontend-admin`
    - **Build command**: `npm run build`
@@ -195,17 +212,17 @@ generated SQL before committing it, same as reviewing any other diff).
    it's a second layer in front of the app's own staff login, not a
    replacement for it.
 
-Either app can go on Cloudflare Pages instead of GitLab Pages with the same
+Either app can go on Cloudflare Pages instead of GitHub Pages with the same
 build settings pattern (root directory `frontend`, output `dist`) if you'd
-rather keep both in one place — just drop the `pages` job from
-`.gitlab-ci.yml` if you do.
+rather keep both in one place — just drop `.github/workflows/deploy-pages.yml`
+if you do.
 
 ## Day-to-day operations
 
 - **Logs**: `podman logs -f mapskayz_api_1` (add `mapskayz_db_1` for Postgres).
 - **Rollback**: re-run the deploy with an older tag —
-  `ssh mapskayz-deploy@host "IMAGE_TAG=<previous-short-sha> CI_REGISTRY_IMAGE=... /opt/mapskayz/deploy.sh"`.
-  Every commit's image is kept in the registry tagged by its short SHA.
+  `ssh mapskayz-deploy@host "IMAGE_TAG=<previous-commit-sha> REGISTRY_IMAGE=ghcr.io/... /opt/mapskayz/deploy.sh"`.
+  Every commit's image is kept in the registry tagged by its full commit SHA.
 - **Database backup**: `podman exec mapskayz_db_1 pg_dump -U mapskayz mapskayz | gzip > backup-$(date +%F).sql.gz`
   — schedule this with cron; nothing here does it automatically.
 - **Cert renewal**: automatic via `certbot.timer`; `sudo certbot renew --dry-run`
@@ -225,7 +242,11 @@ rather keep both in one place — just drop the `pages` job from
 - **SSE (live sync) not updating in the admin app**: confirm Nginx picked up
   the `/api/sync/events` block in `mapskayz-api.conf` — `curl -N https://api.yourdomain.com/api/sync/events`
   should hang open and print a heartbeat every ~20s, not disconnect.
-- **CI deploy job fails to connect**: `ssh-keyscan` output must match what's
-  in the job log; if the droplet was rebuilt its host key changed and the
-  `known_hosts` step will need the new one (it's fetched fresh every run, so
-  this is usually just a stale `DEPLOY_HOST` value).
+- **Deploy job fails to connect over SSH**: `ssh-keyscan` output must match
+  what's in the job log; if the droplet was rebuilt its host key changed and
+  the `known_hosts` step will need the new one (it's fetched fresh every run,
+  so this is usually just a stale `DEPLOY_HOST` secret).
+- **`denied: permission_denied` on `podman login ghcr.io`**: the token needs
+  `read:packages` (VPS pulling) or `write:packages` (pushing by hand) — a
+  fine-grained token needs its "Packages" permission set explicitly, which
+  is easy to miss.

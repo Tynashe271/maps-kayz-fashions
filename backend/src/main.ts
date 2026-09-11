@@ -12,7 +12,7 @@ async function bootstrap() {
   app.use(urlencoded({ extended: true, limit: '3mb' }));
   app.use(compression());
   // CORS_ORIGINS is a comma-separated allowlist for production, where the
-  // frontend (Cloudflare Pages / GitLab Pages) is a different origin from
+  // frontend (Cloudflare Pages / GitHub Pages) is a different origin from
   // this API. Unset (local dev, or until you configure it) falls back to
   // reflecting the request origin, same as the previous app.enableCors().
   const corsOrigins = process.env.CORS_ORIGINS?.split(',').map((origin) => origin.trim()).filter(Boolean);

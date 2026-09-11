@@ -1,0 +1,60 @@
+# Publishes the customer storefront (frontend/) via GitHub Pages. The admin
+# app is deployed separately as its own Cloudflare Pages project rather than
+# crammed into a subpath here — it's a different Vue Router / Vite "base"
+# than this one, and keeping it fully separate also keeps it on its own
+# access-controlled domain. See DEPLOYMENT.md for both.
+#
+# One-time setup: Settings > Pages > Build and deployment > Source =
+# "GitHub Actions".
+#
+# Optional repo variable (Settings > Secrets and variables > Actions >
+# Variables) — not a secret, just the backend's public URL:
+#   VITE_API_BASE_URL = https://api.yourdomain.com
+
+name: Deploy storefront to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - frontend/**
+      - .github/workflows/deploy-pages.yml
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build
+        working-directory: frontend
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+        run: |
+          npm ci
+          npm run build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

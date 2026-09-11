@@ -4,7 +4,7 @@
 
 // In dev, Vite proxies "/api" to the backend (see vite.config.js) so a bare
 // relative path works. In production the frontend is static-hosted (Cloudflare
-// Pages / GitLab Pages) separately from the backend VPS, so there's no proxy —
+// Pages / GitHub Pages) separately from the backend VPS, so there's no proxy —
 // VITE_API_BASE_URL must be set at build time to the backend's origin
 // (e.g. https://api.mapskayz.com). Leave it unset for local dev.
 const BASE = `${import.meta.env.VITE_API_BASE_URL ?? ''}/api`
