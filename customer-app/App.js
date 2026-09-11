@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { ActivityIndicator, BackHandler, Linking, Pressable, SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar'
 import { WebView } from 'react-native-webview'
+import { CustomerSidebar } from './src/CustomerSidebar'
 
 const STOREFRONT_URL = 'https://shop.tinashenyenyesa.co.zw/'
 const INTERNAL_HOSTS = new Set(['shop.tinashenyenyesa.co.zw', 'maps-kayz-backend.onrender.com'])
@@ -11,6 +12,8 @@ export default function App() {
   const [canGoBack, setCanGoBack] = useState(false)
   const [failed, setFailed] = useState(false)
   const [reloadKey, setReloadKey] = useState(0)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [currentUrl, setCurrentUrl] = useState(STOREFRONT_URL)
 
   const goBack = useCallback(() => {
     if (!canGoBack) return false
@@ -40,15 +43,21 @@ export default function App() {
     setReloadKey((value) => value + 1)
   }
 
+  function navigate(path) {
+    setFailed(false)
+    setCurrentUrl(new URL(path, STOREFRONT_URL).toString())
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ExpoStatusBar style="light" backgroundColor="#070707" />
       <View style={styles.app}>
+        <View style={styles.appBar}><Pressable accessibilityLabel="Open customer menu" style={styles.menuButton} onPress={() => setMenuOpen(true)}><Text style={styles.menuIcon}>☰</Text></Pressable><Text style={styles.appBarTitle}>MAPS KAYZ</Text><Pressable style={styles.cartButton} onPress={() => navigate('/cart')}><Text style={styles.cartText}>CART</Text></Pressable></View>
         {failed ? <ErrorState onRetry={reload} /> : (
           <WebView
             key={reloadKey}
             ref={webView}
-            source={{ uri: STOREFRONT_URL }}
+            source={{ uri: currentUrl }}
             style={styles.webView}
             containerStyle={styles.webViewContainer}
             originWhitelist={['*']}
@@ -68,6 +77,7 @@ export default function App() {
             applicationNameForUserAgent="MapsKayzCustomerApp/1.0"
           />
         )}
+        <CustomerSidebar open={menuOpen} onClose={() => setMenuOpen(false)} onNavigate={navigate} />
       </View>
     </SafeAreaView>
   )
@@ -84,6 +94,9 @@ function ErrorState({ onRetry }) {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, paddingTop: StatusBar.currentHeight || 0, backgroundColor: '#070707' },
   app: { flex: 1, backgroundColor: '#070707' },
+  appBar: { height: 54, paddingHorizontal: 12, borderBottomWidth: 1, borderBottomColor: '#302c2d', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  menuButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }, menuIcon: { color: '#f7f2ea', fontSize: 25 },
+  appBarTitle: { color: '#f7f2ea', fontFamily: 'serif', fontSize: 14, letterSpacing: 1.5 }, cartButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }, cartText: { color: '#f2a8c4', fontSize: 9, fontWeight: '800' },
   webViewContainer: { flex: 1, backgroundColor: '#070707' },
   webView: { flex: 1, backgroundColor: '#070707' },
   loadingState: { ...StyleSheet.absoluteFillObject, zIndex: 2, alignItems: 'center', justifyContent: 'center', gap: 22, backgroundColor: '#070707' },
