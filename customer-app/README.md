@@ -21,4 +21,9 @@ The production API is the default. To use a different API, copy `.env.example` t
 - WhatsApp ordering
 - Customer registration and login
 - Customer dashboard summary and logout
+- In-app access to all storefront features: categories, product details,
+  checkout, payment, tracking, returns, wishlist, saved looks, style profile,
+  loyalty, coupons, store credit, addresses, notifications, reviews,
+  referrals, support, profile and security
+- Native login is passed securely into the in-app storefront session
 - Android and iOS identifiers

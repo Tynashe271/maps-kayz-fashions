@@ -16,6 +16,7 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar'
+import { WebView } from 'react-native-webview'
 import { api } from './src/api'
 import { colors } from './src/theme'
 
@@ -24,21 +25,26 @@ const tabs = [
   ['shop', '◇', 'Shop'],
   ['cart', '▢', 'Cart'],
   ['account', '○', 'Account'],
+  ['more', '☰', 'More'],
 ]
 
 export default function App() {
   const [tab, setTab] = useState('home')
   const [user, setUser] = useState(null)
+  const [token, setToken] = useState(null)
   const [cart, setCart] = useState({ items: [], itemCount: 0, total: 0 })
   const [booting, setBooting] = useState(true)
+  const [webPath, setWebPath] = useState('/')
 
   const restore = useCallback(async () => {
     try {
-      const [storedUser, cartId] = await Promise.all([
+      const [storedUser, storedToken, cartId] = await Promise.all([
         AsyncStorage.getItem('mk_user'),
+        AsyncStorage.getItem('mk_token'),
         AsyncStorage.getItem('mk_cart_id'),
       ])
       if (storedUser) setUser(JSON.parse(storedUser))
+      if (storedToken) setToken(storedToken)
       if (cartId) setCart(await api.cart(cartId))
     } catch {
       await AsyncStorage.removeItem('mk_cart_id')
@@ -50,10 +56,12 @@ export default function App() {
   useEffect(() => { restore() }, [restore])
 
   async function signIn(session) {
+    const nextToken = session.accessToken || session.token
     await AsyncStorage.multiSet([
-      ['mk_token', session.accessToken || session.token],
+      ['mk_token', nextToken],
       ['mk_user', JSON.stringify(session.user)],
     ])
+    setToken(nextToken)
     setUser(session.user)
     setTab('account')
   }
@@ -61,6 +69,7 @@ export default function App() {
   async function signOut() {
     await AsyncStorage.multiRemove(['mk_token', 'mk_user'])
     setUser(null)
+    setToken(null)
     setTab('home')
   }
 
@@ -97,10 +106,12 @@ export default function App() {
           {tab === 'shop' && <ShopScreen onAdd={add} />}
           {tab === 'cart' && <CartScreen cart={cart} setCart={setCart} />}
           {tab === 'account' && (user
-            ? <AccountScreen user={user} onLogout={signOut} />
+            ? <AccountScreen user={user} onLogout={signOut} onOpenWeb={() => { setWebPath('/account'); setTab('web') }} />
             : <AuthScreen onSuccess={signIn} />)}
+          {tab === 'more' && <MoreScreen open={(path) => { setWebPath(path); setTab('web') }} />}
+          {tab === 'web' && <WebStorefront path={webPath} user={user} token={token} onBack={() => setTab('more')} />}
         </View>
-        <BottomTabs active={tab} cartCount={cart.itemCount || 0} onChange={setTab} />
+        {tab !== 'web' && <BottomTabs active={tab} cartCount={cart.itemCount || 0} onChange={setTab} />}
       </View>
     </SafeAreaView>
   )
@@ -240,7 +251,7 @@ function AuthScreen({ onSuccess }) {
   )
 }
 
-function AccountScreen({ user, onLogout }) {
+function AccountScreen({ user, onLogout, onOpenWeb }) {
   const [dashboard, setDashboard] = useState(null)
   const [loading, setLoading] = useState(true)
   useEffect(() => { api.dashboard().then(setDashboard).catch(() => {}).finally(() => setLoading(false)) }, [])
@@ -254,9 +265,59 @@ function AccountScreen({ user, onLogout }) {
         <Stat title="Cart items" value={dashboard?.cart?.itemCount || 0} />
         <Stat title="Wishlist" value={dashboard?.wishlist?.length || 0} />
       </View>}
-      <Pressable style={styles.outlineButton} onPress={() => Linking.openURL('https://shop.tinashenyenyesa.co.zw/account')}><Text style={styles.outlineText}>OPEN FULL ACCOUNT  →</Text></Pressable>
+      <Pressable style={styles.outlineButton} onPress={onOpenWeb}><Text style={styles.outlineText}>OPEN ALL ACCOUNT TOOLS  →</Text></Pressable>
       <Pressable style={styles.logoutButton} onPress={onLogout}><Text style={styles.logoutText}>LOG OUT</Text></Pressable>
     </ScrollView>
+  )
+}
+
+const webSections = [
+  ['/categories', 'Categories', 'Browse every fashion and fragrance collection'],
+  ['/checkout', 'Checkout', 'Delivery details, payment and order placement'],
+  ['/track-order', 'Track an order', 'See current order and delivery status'],
+  ['/returns', 'Returns & exchanges', 'Check eligibility and submit a request'],
+  ['/account?tab=orders', 'My orders', 'Purchase history, invoices and reordering'],
+  ['/account?tab=wishlist', 'Wishlist', 'Saved products and personal notes'],
+  ['/account?tab=looks', 'Saved looks', 'Saved outfits and styling combinations'],
+  ['/account?tab=recent', 'Recently viewed', 'Return to products you viewed'],
+  ['/account?tab=style', 'Sizes & style', 'Fit, colour and fragrance preferences'],
+  ['/account?tab=loyalty', 'Loyalty & rewards', 'Points, rewards and referrals'],
+  ['/account?tab=coupons', 'Coupons & credit', 'Offers, gift cards and store credit'],
+  ['/account?tab=addresses', 'Addresses', 'Saved delivery destinations'],
+  ['/account?tab=notifications', 'Notifications', 'Updates and communication preferences'],
+  ['/account?tab=reviews', 'Reviews & questions', 'Product feedback and questions'],
+  ['/account?tab=support', 'Support centre', 'Tickets and WhatsApp support'],
+  ['/account?tab=profile', 'Profile & security', 'Personal details and privacy settings'],
+]
+
+function MoreScreen({ open }) {
+  return (
+    <FlatList
+      data={webSections}
+      keyExtractor={(item) => item[0]}
+      contentContainerStyle={styles.list}
+      ListHeaderComponent={<View><Text style={styles.eyebrow}>EVERYTHING MAPS KAYZ</Text><Text style={styles.pageTitle}>More</Text><Text style={styles.lead}>Every customer website feature is available here without leaving the app.</Text></View>}
+      renderItem={({ item }) => <Pressable style={styles.moreRow} onPress={() => open(item[0])}><View style={styles.moreCopy}><Text style={styles.moreTitle}>{item[1]}</Text><Text style={styles.muted}>{item[2]}</Text></View><Text style={styles.moreArrow}>→</Text></Pressable>}
+    />
+  )
+}
+
+function WebStorefront({ path, user, token, onBack }) {
+  const injection = token && user
+    ? `localStorage.setItem('mk_token', ${JSON.stringify(token)}); localStorage.setItem('mk_user', ${JSON.stringify(JSON.stringify(user))}); true;`
+    : 'true;'
+  return (
+    <View style={styles.webScreen}>
+      <View style={styles.webBar}><Pressable style={styles.webBack} onPress={onBack}><Text style={styles.webBackText}>← Back to app</Text></Pressable><Text style={styles.webBarTitle}>MAPS KAYZ</Text></View>
+      <WebView
+        source={{ uri: `https://shop.tinashenyenyesa.co.zw${path}` }}
+        injectedJavaScriptBeforeContentLoaded={injection}
+        sharedCookiesEnabled
+        startInLoadingState
+        renderLoading={() => <View style={[styles.webLoader, styles.center]}><ActivityIndicator color={colors.pink} size="large" /></View>}
+        style={styles.webView}
+      />
+    </View>
   )
 }
 
@@ -294,5 +355,7 @@ const styles = StyleSheet.create({
   auth: { flexGrow: 1, justifyContent: 'center', padding: 24 }, switchButton: { minHeight: 48, alignItems: 'center', justifyContent: 'center' }, switchText: { color: colors.pink, fontSize: 13 },
   stats: { gap: 12, marginVertical: 18 }, stat: { minHeight: 120, padding: 18, borderWidth: 1, borderColor: colors.line, justifyContent: 'space-between' }, statValue: { color: colors.text, fontFamily: 'serif', fontSize: 36 }, loader: { marginVertical: 45 },
   outlineButton: { minHeight: 50, borderWidth: 1, borderColor: colors.text, alignItems: 'center', justifyContent: 'center', marginTop: 12 }, outlineText: { color: colors.text, fontSize: 11, fontWeight: '700', letterSpacing: 1 }, logoutButton: { minHeight: 50, alignItems: 'center', justifyContent: 'center', marginTop: 12 }, logoutText: { color: colors.danger, fontSize: 11, fontWeight: '700', letterSpacing: 1 },
+  moreRow: { minHeight: 82, paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: colors.line, flexDirection: 'row', alignItems: 'center', gap: 15 }, moreCopy: { flex: 1 }, moreTitle: { color: colors.text, fontFamily: 'serif', fontSize: 17, marginBottom: 5 }, moreArrow: { color: colors.pink, fontSize: 22 },
+  webScreen: { flex: 1, backgroundColor: colors.background }, webBar: { minHeight: 52, paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: colors.line, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }, webBack: { minHeight: 44, justifyContent: 'center' }, webBackText: { color: colors.pink, fontWeight: '700', fontSize: 12 }, webBarTitle: { color: colors.text, fontFamily: 'serif', fontSize: 13, letterSpacing: 1.5 }, webView: { flex: 1, backgroundColor: colors.background }, webLoader: { ...StyleSheet.absoluteFillObject, backgroundColor: colors.background },
   tabs: { height: 70, flexDirection: 'row', borderTopWidth: 1, borderTopColor: colors.line, backgroundColor: '#0a0a0a' }, tab: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4 }, tabIcon: { color: colors.muted, fontSize: 22 }, tabLabel: { color: colors.muted, fontSize: 9, fontWeight: '600' }, tabActive: { color: colors.pink },
 })
