@@ -113,6 +113,28 @@ avoid (Render's own paid tiers remove it too, for that matter).
 4. Note the Pages URL (Settings > Pages shows it, or add a custom domain
    there) and come back to step 5 to add it to `CORS_ORIGINS`.
 
+**Custom domain (done, pending DNS)**: `shop.tinashenyenyesa.co.zw` is set
+as this repo's Pages custom domain (Settings > Pages > `cname`), and
+`deploy-pages.yml`'s build no longer sets `VITE_BASE_PATH` — a custom
+domain serves from `/`, not `/maps-kayz-fashions/`, so the override from
+the plain-project-site era would now build wrong paths (if the custom
+domain is ever removed, that override needs to come back — see the
+workflow's comment).
+
+This domain's DNS stays with the registrar
+(WebZim, [cpanel.tinashenyenyesa.co.zw](https://cpanel.tinashenyenyesa.co.zw))
+rather than moving to Cloudflare, so the one remaining step has to be done
+by whoever holds that cPanel login (never an AI agent): in WebZim's cPanel
+> Zone Editor, add a **CNAME record** — name `shop`, target
+`tynashe271.github.io`. Until that record exists and propagates (WebZim
+quotes up to 24h, GitHub's own docs say up to 48h for the DNS check to
+clear), `shop.tinashenyenyesa.co.zw` won't resolve at all — there's no
+interim fallback URL once a custom domain is configured in Pages' own
+settings, so don't be alarmed if it 404s or times out during this window.
+GitHub also won't enable **Enforce HTTPS** (Settings > Pages) until it can
+issue a certificate after the DNS record resolves — check back and toggle
+it on once that option stops being greyed out.
+
 ## 4. The admin app (Cloudflare Pages) (already done)
 
 Live at `https://maps-kayz-admin.pages.dev`. Cloudflare dashboard > Workers
@@ -142,6 +164,16 @@ Credentials live in this project's **Settings > Variables and secrets**:
 - `BASIC_AUTH_PASS` (Secret, not re-viewable once saved — rotate it there
   if it's ever lost, don't try to recover the old value)
 
+**Custom domain (done, pending DNS)**: `admin.tinashenyenyesa.co.zw` is
+added under this project's **Custom domains** tab (status: Initializing,
+via "My DNS provider" since this domain's DNS stays at WebZim rather than
+moving to Cloudflare). The remaining step is the same kind as the
+storefront's — add it yourself in WebZim's cPanel > Zone Editor, never an
+AI agent: a **CNAME record**, name `admin`, target
+`maps-kayz-admin.pages.dev`. Cloudflare re-checks periodically and the
+custom domain activates on its own once the record resolves; no redeploy
+needed for this part (unlike the env var changes above).
+
 Changing either takes effect on the next deploy — after saving, use
 **Manage deployment > Retry deployment** on the latest one rather than
 waiting for the next push.
@@ -166,15 +198,16 @@ but worth knowing if this ever needs debugging again.
 
 ## 5. CORS (already done)
 
-Render's **Environment** tab has `CORS_ORIGINS` set to both frontend
-origins, comma-separated:
+Render's **Environment** tab has `CORS_ORIGINS` set to all four frontend
+origins currently in play — the `*.pages.dev`/`*.github.io` ones stay
+listed alongside the custom domains rather than being replaced, since
+both still resolve to the same deployments:
 ```
-https://tynashe271.github.io,https://maps-kayz-admin.pages.dev
+https://tynashe271.github.io,https://maps-kayz-admin.pages.dev,https://shop.tinashenyenyesa.co.zw,https://admin.tinashenyenyesa.co.zw
 ```
 Editing it there triggers an automatic redeploy — no extra step needed. If
-a custom domain ever replaces either `*.pages.dev`/`*.github.io` origin,
-add it here too (comma-separated, no trailing slash) or that frontend will
-start getting CORS errors.
+another custom domain is ever added, add it here too (comma-separated, no
+trailing slash) or that frontend will start getting CORS errors.
 
 ## Day-to-day operations
 
