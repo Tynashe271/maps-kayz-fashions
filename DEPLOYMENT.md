@@ -45,7 +45,8 @@ human with Render/Neon/GitHub/Cloudflare access can do.
   `maps-kayz-fashions` project exists with a `production` branch.
 - This project pushed to GitHub (already done —
   `github.com/Tynashe271/maps-kayz-fashions`).
-- A Cloudflare account (free tier is fine) for the admin app — not set up yet.
+- A Cloudflare account (free tier is fine) for the admin app — already set
+  up and connected to GitHub.
 
 ## 1. The Neon database (already done)
 
@@ -112,22 +113,37 @@ avoid (Render's own paid tiers remove it too, for that matter).
 4. Note the Pages URL (Settings > Pages shows it, or add a custom domain
    there) and come back to step 5 to add it to `CORS_ORIGINS`.
 
-## 4. Deploy the admin app (Cloudflare Pages)
+## 4. The admin app (Cloudflare Pages) (already done)
 
-1. Cloudflare dashboard > Workers & Pages > Create > Pages > connect the
-   same GitHub repo.
-2. Build settings:
+Live at `https://maps-kayz-admin.pages.dev`. Cloudflare dashboard > Workers
+& Pages > Create > Pages > connected to the same GitHub repo, project name
+`maps-kayz-admin`, with:
    - **Root directory**: `frontend-admin`
    - **Build command**: `npm run build`
    - **Build output directory**: `dist`
    - **Environment variable**: `VITE_API_BASE_URL` = `https://maps-kayz-backend.onrender.com`
-3. Note the `*.pages.dev` URL it gives you (or add a custom domain in the
-   project's Custom domains tab).
-4. (Recommended) Put this project behind
-   [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
-   so the admin panel isn't reachable by anyone who just guesses the URL —
-   it's a second layer in front of the app's own staff login, not a
-   replacement for it.
+
+To change the API URL, add a custom domain, or edit any of the above later:
+this project's **Settings** tab. Every push to `master` auto-deploys, same
+as Render — no GitHub Actions involved here either.
+
+(Recommended, not yet done) Put this project behind
+[Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
+so the admin panel isn't reachable by anyone who just guesses the URL —
+it's a second layer in front of the app's own staff login, not a
+replacement for it.
+
+**Gotcha if this project is ever recreated from scratch**: `frontend-admin`
+shares code with `frontend` via a `@store` Vite alias into `../frontend/src`
+(see `frontend-admin/vite.config.js`). Some of that shared code (e.g.
+`frontend/src/layouts/AdminLayout.vue`) imports `vue-router`, and Node's
+module resolution for that import walks up from *its own* file location —
+`frontend/node_modules`, not `frontend-admin/node_modules`. Cloudflare Pages
+only installs the configured root directory's dependencies, so without
+help the build fails with `Rolldown failed to resolve import "vue-router"`.
+Fixed by a `postinstall` script in `frontend-admin/package.json` that also
+runs `npm install` in `../frontend` — already committed, nothing to redo,
+but worth knowing if this ever needs debugging again.
 
 ## 5. Close the loop: lock down CORS
 
