@@ -19,7 +19,7 @@ const NotFoundPage = () => import('../pages/NotFoundPage.vue')
 
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   scrollBehavior(to, from, saved) {
     if (saved) return saved
     // Dashboard tabs use a query value. Switching tabs should replace the

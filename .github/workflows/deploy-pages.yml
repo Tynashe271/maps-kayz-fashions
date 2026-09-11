@@ -41,9 +41,17 @@ jobs:
         working-directory: frontend
         env:
           VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+          # This is a project site (github.io/<repo>/), not a custom domain,
+          # so the app must know its own subpath — see vite.config.js.
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
         run: |
           npm ci
           npm run build
+      - name: SPA fallback for client-side routing
+        # GitHub Pages serves 404.html for any path it doesn't recognize as a
+        # file. Vue Router uses history mode, so a hard refresh (or a shared
+        # link) on e.g. /shop must still resolve to the app shell.
+        run: cp frontend/dist/index.html frontend/dist/404.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

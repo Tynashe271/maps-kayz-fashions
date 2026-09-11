@@ -2,6 +2,11 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
+  // GitHub Pages project sites (the storefront's deploy target) are served
+  // from /<repo-name>/, not /. VITE_BASE_PATH is set by
+  // .github/workflows/deploy-pages.yml only for that build; local dev and
+  // any future custom-domain deploy keep the default root path.
+  base: process.env.VITE_BASE_PATH ?? '/',
   plugins: [vue()],
   server: {
     port: 9990,
