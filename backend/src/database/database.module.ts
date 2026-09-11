@@ -23,8 +23,14 @@ import { Cart } from './entities/cart.entity';
         const production = config.get('NODE_ENV') === 'production';
         const databaseUrl = config.get<string>('DATABASE_URL');
         if (production && !databaseUrl) throw new Error('DATABASE_URL is required when NODE_ENV=production');
+        // Set DATABASE_SSL=true for a managed/serverless Postgres that terminates
+        // TLS with a publicly-trusted cert (Neon, Supabase, most "?sslmode=require"
+        // providers) — node-postgres doesn't reliably pick that up from the
+        // connection string alone. Leave unset for the self-hosted "db" service
+        // in compose.prod.yaml, which has no TLS listener at all.
+        const databaseSsl = config.get('DATABASE_SSL') === 'true';
         const connection = databaseUrl
-          ? { type: 'postgres' as const, url: databaseUrl }
+          ? { type: 'postgres' as const, url: databaseUrl, ssl: databaseSsl ? { rejectUnauthorized: false } : undefined }
           : { type: 'sqlite' as const, database: config.get('DATABASE_PATH', 'maps-kayz.sqlite') };
         return {
         ...connection,

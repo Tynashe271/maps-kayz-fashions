@@ -1,0 +1,81 @@
+# Active backend deployment path for now — see DEPLOYMENT.md's "Google Cloud
+# Run" section for the one-time GCP project/service-account setup this
+# depends on. deploy-backend-vps.yml (DigitalOcean + Podman) is kept dormant
+# alongside this for whenever there's a VPS to switch to instead.
+#
+# Required repo secrets (Settings > Secrets and variables > Actions > Secrets):
+#   GCP_PROJECT_ID          - the GCP project id (not its display name)
+#   GCP_SA_KEY              - JSON key for the github-actions-deploy service account
+#   DATABASE_URL            - Neon (or other managed Postgres) connection string
+#   JWT_SECRET
+#   CORS_ORIGINS            - comma-separated frontend origin(s); can start empty
+#   WHATSAPP_ORDER_NUMBER
+#   PAYMENT_WEBHOOK_SECRET  - leave the secret empty until a real provider is wired up
+#   WHATSAPP_WEBHOOK_SECRET
+#
+# Re-run manually (Actions tab > this workflow > Run workflow) after changing
+# any of the above secrets — Cloud Run only picks up new env vars on a new
+# deploy, not automatically.
+
+name: Deploy backend (Cloud Run)
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - backend/**
+      - .github/workflows/deploy-backend-cloudrun.yml
+  workflow_dispatch: {}
+
+env:
+  GCP_REGION: europe-west1
+  SERVICE_NAME: maps-kayz-backend
+  AR_REPO: maps-kayz
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker "${{ env.GCP_REGION }}-docker.pkg.dev" --quiet
+
+      - name: Build and push
+        working-directory: backend
+        run: |
+          IMAGE="${{ env.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/backend:${{ github.sha }}"
+          docker build -f Containerfile -t "$IMAGE" .
+          docker push "$IMAGE"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.GCP_REGION }}
+          image: ${{ env.IMAGE }}
+          flags: --allow-unauthenticated
+          # Cloud Run manages PORT itself — don't set it here, it rejects deploys that try.
+          env_vars: |
+            NODE_ENV=production
+            DATABASE_SSL=true
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
+            WHATSAPP_ORDER_NUMBER=${{ secrets.WHATSAPP_ORDER_NUMBER }}
+            PAYMENT_WEBHOOK_SECRET=${{ secrets.PAYMENT_WEBHOOK_SECRET }}
+            WHATSAPP_WEBHOOK_SECRET=${{ secrets.WHATSAPP_WEBHOOK_SECRET }}
+
+      - name: Print the service URL
+        run: gcloud run services describe "${{ env.SERVICE_NAME }}" --region "${{ env.GCP_REGION }}" --format='value(status.url)'

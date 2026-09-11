@@ -1,4 +1,8 @@
-# See DEPLOYMENT.md for the full runbook (VPS setup, secrets, DNS).
+# DORMANT FOR NOW — the backend deploys to Google Cloud Run instead (see
+# deploy-backend-cloudrun.yml) while there's no VPS provisioned. This DigitalOcean
+# + Podman path is kept ready to switch back to later: manual-trigger only
+# (Actions tab > this workflow > Run workflow) so it doesn't fail on every
+# push in the meantime. See DEPLOYMENT.md's "DigitalOcean VPS" section.
 #
 # build -> builds backend/Containerfile, pushes to the GitHub Container
 #          Registry (ghcr.io), tagged with the commit SHA and "latest".
@@ -11,14 +15,10 @@
 #   DEPLOY_USER       - e.g. mapskayz-deploy
 # GITHUB_TOKEN is provided automatically — no setup needed for registry auth.
 
-name: Deploy backend
+name: Deploy backend (DigitalOcean VPS)
 
 on:
-  push:
-    branches: [master]
-    paths:
-      - backend/**
-      - .github/workflows/deploy-backend.yml
+  workflow_dispatch: {}
 
 permissions:
   contents: read

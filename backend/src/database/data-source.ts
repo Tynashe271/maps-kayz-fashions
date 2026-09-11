@@ -21,6 +21,9 @@ import { Cart } from './entities/cart.entity';
 export default new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
+  // Same DATABASE_SSL convention as database.module.ts — set it when
+  // generating/running migrations against Neon or another managed Postgres.
+  ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
   entities: [Product, Category, Customer, Order, OrderItem, InventoryItem, StockMovement, Delivery, ReturnRequest, PlatformRecord, UserAccount, Cart],
   migrations: [__dirname + '/migrations/*{.ts,.js}'],
   synchronize: false,
