@@ -10,7 +10,28 @@ import CartPage from './CartPage.vue'
 import { cartStore, refreshCart } from '../lib/cart'
 
 const route=useRoute(), router=useRouter(), toast=ref(''), search=ref(''), status=ref('All'), selected=ref(null)
-const tabs=['overview','orders','bag','track','returns','wishlist','looks','recent','style','loyalty','coupons','credit','addresses','notifications','support','reviews','referrals','profile','security']
+const accountMenuItems = [
+  ['overview', 'Overview'],
+  ['orders', 'My Orders'],
+  ['track', 'Track Order'],
+  ['returns', 'Returns & Exchanges'],
+  ['bag', 'My Cart'],
+  ['wishlist', 'Wishlist'],
+  ['looks', 'Saved Looks'],
+  ['recent', 'Recently Viewed'],
+  ['style', 'My Sizes & Style'],
+  ['loyalty', 'Loyalty & Rewards'],
+  ['coupons', 'Coupons'],
+  ['credit', 'Gift Cards & Credit'],
+  ['addresses', 'Addresses'],
+  ['notifications', 'Notifications'],
+  ['reviews', 'Reviews & Questions'],
+  ['referrals', 'Referrals'],
+  ['support', 'Support Centre'],
+  ['profile', 'Profile'],
+  ['security', 'Privacy & Security'],
+]
+const tabs = accountMenuItems.map(([tab]) => tab)
 const activeTab=computed(()=>tabs.includes(route.query.tab)?route.query.tab:'overview')
 // Below 600px the sidebar becomes a fixed drawer (see .dashboard-layout.nav-open
 // in styles.css) instead of the horizontal-scroll tab strip used at wider mobile
@@ -66,7 +87,7 @@ async function clearHistory(){await Promise.all(recent.value.filter(x=>x.id).map
 
 <template><div class="customer-dashboard"><div v-if="toast" class="dashboard-toast">{{toast}}</div>
 <header class="dashboard-hero"><div><p class="eyebrow dark">Customer dashboard</p><h1>Welcome back,<br><em>{{name}}.</em></h1><p>Your orders, style, rewards and account — all in one place.</p></div><div class="profile-chip"><img v-if="profilePhoto" :src="profilePhoto" alt="Profile photo"><span v-else>{{initials}}</span><div><strong>{{profile.name||authStore.user?.email}}</strong><small>{{authStore.user?.email}} · Customer account</small></div></div></header>
-<div class="dashboard-layout" :class="{'nav-open':mobileNavOpen}"><button type="button" class="dashboard-menu-button" aria-label="Toggle account menu" @click="mobileNavOpen=!mobileNavOpen"><span>{{tabs.indexOf(activeTab)+1}}</span> My account menu ☰</button><div v-if="mobileNavOpen" class="dashboard-nav-backdrop" @click="mobileNavOpen=false"></div><aside class="dashboard-sidebar"><router-link to="/shop" class="dashboard-sidebar-shop"><span>🛍</span>Shop</router-link><p>My account</p><button v-for="(x,i) in [['overview','Overview'],['orders','My Orders'],['bag','My Cart'],['track','Track Order'],['returns','Returns & Exchanges'],['wishlist','Wishlist'],['looks','Saved Looks'],['recent','Recently Viewed'],['style','My Sizes & Style'],['loyalty','Loyalty & Rewards'],['coupons','Coupons'],['credit','Gift Cards & Credit'],['addresses','Addresses'],['notifications','Notifications'],['support','Support Centre'],['reviews','Reviews & Questions'],['referrals','Referrals'],['profile','Profile'],['security','Privacy & Security']]" :key="x[0]" :class="{active:activeTab===x[0]}" @click="go(x[0])"><span>{{String(i+1).padStart(2,'0')}}</span>{{x[1]}}<b v-if="x[0]==='bag'">{{cartStore.itemCount}}</b><b v-if="x[0]==='wishlist'">{{wishlist.length}}</b><b v-if="x[0]==='notifications'">{{notices.filter(n=>!n.read).length}}</b></button><button @click="logout"><span>20</span>Log Out</button></aside>
+<div class="dashboard-layout" :class="{'nav-open':mobileNavOpen}"><button type="button" class="dashboard-menu-button" aria-label="Toggle account menu" @click="mobileNavOpen=!mobileNavOpen"><span>{{tabs.indexOf(activeTab)+1}}</span> My account menu ☰</button><div v-if="mobileNavOpen" class="dashboard-nav-backdrop" @click="mobileNavOpen=false"></div><aside class="dashboard-sidebar"><p>My account</p><button v-for="(x,i) in accountMenuItems" :key="x[0]" :class="{active:activeTab===x[0]}" @click="go(x[0])"><span>{{String(i+1).padStart(2,'0')}}</span>{{x[1]}}<b v-if="x[0]==='bag'">{{cartStore.itemCount}}</b><b v-if="x[0]==='wishlist'">{{wishlist.length}}</b><b v-if="x[0]==='notifications'">{{notices.filter(n=>!n.read).length}}</b></button><router-link to="/shop" class="dashboard-sidebar-shop"><span>🛍</span>Continue shopping</router-link><button @click="logout"><span>20</span>Log Out</button></aside>
 <main class="dashboard-content">
 <template v-if="activeTab==='overview'"><section class="dashboard-summary four"><article><span>Active orders</span><strong>{{orders.length}}</strong><button @click="go('orders')">View orders →</button></article><article><span>Cart items</span><strong>{{cartStore.itemCount}}</strong><button @click="go('bag')">View cart →</button></article><article><span>Wishlist</span><strong>{{wishlist.length}}</strong><button @click="go('wishlist')">View wishlist →</button></article><article><span>Notifications</span><strong>{{notices.filter(n=>!n.read).length}}</strong><button @click="go('notifications')">View notifications →</button></article></section>
 <section class="dashboard-grid-main"><article class="dashboard-card"><div class="card-heading"><div><p class="eyebrow dark">Orders</p><h2>No active delivery</h2></div></div><p class="safe-note">New order and delivery updates will appear here.</p><button class="text-action" @click="go('track')">Track an order →</button></article><article class="dashboard-card"><p class="eyebrow dark">Quick actions</p><div class="quick-actions"><router-link to="/shop">Continue shopping</router-link><button @click="go('bag')">View cart</button><button @click="go('track')">Track order</button><button @click="go('support')">Contact support</button></div></article></section>
