@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "Maps Kayz",
+    "slug": "maps-kayz-customer",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#070707",
+    "primaryColor": "#f2a8c4",
+    "android": {
+      "package": "zw.co.tinashenyenyesa.mapskayz"
+    },
+    "ios": {
+      "bundleIdentifier": "zw.co.tinashenyenyesa.mapskayz",
+      "supportsTablet": true
+    }
+  }
+}
