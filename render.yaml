@@ -1,0 +1,45 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# One-time setup: Render dashboard > New > Blueprint > connect this GitHub
+# repo > Render reads this file and creates the service below, prompting
+# you to fill in the "sync: false" values (Neon's connection string, etc).
+# Every push to master after that auto-deploys — no GitHub Actions needed
+# for this path. See DEPLOYMENT.md's "Render" section.
+#
+# Free tier: no card required, but the service spins down after 15 minutes
+# idle and takes 30-60s to wake back up on the next request. Fine for a
+# low-traffic store "for now"; see DEPLOYMENT.md for the Cloud Run / VPS
+# alternatives once real traffic makes the cold start worth paying to avoid.
+
+services:
+  - type: web
+    name: maps-kayz-backend
+    runtime: docker
+    plan: free
+    dockerfilePath: backend/Containerfile
+    dockerContext: backend
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Neon (or any managed Postgres that terminates TLS with a
+      # publicly-trusted cert) needs this — see database.module.ts.
+      - key: DATABASE_SSL
+        value: "true"
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      # Comma-separated frontend origin(s) — leave blank in the dashboard
+      # until the storefront/admin app are deployed, then come back and
+      # fill it in (see DEPLOYMENT.md's "close the loop" step).
+      - key: CORS_ORIGINS
+        sync: false
+      - key: WHATSAPP_ORDER_NUMBER
+        sync: false
+      # Leave both blank until a real payment provider / WhatsApp Business
+      # Platform webhook is configured against this backend.
+      - key: PAYMENT_WEBHOOK_SECRET
+        sync: false
+      - key: WHATSAPP_WEBHOOK_SECRET
+        sync: false

@@ -1,7 +1,9 @@
-# Active backend deployment path for now — see DEPLOYMENT.md's "Google Cloud
-# Run" section for the one-time GCP project/service-account setup this
-# depends on. deploy-backend-vps.yml (DigitalOcean + Podman) is kept dormant
-# alongside this for whenever there's a VPS to switch to instead.
+# DORMANT FOR NOW — Render (render.yaml, no card required) is the active
+# backend path while Google Cloud's billing-account requirement is parked.
+# Manual-trigger only so it doesn't fail on every push. See DEPLOYMENT.md's
+# "Google Cloud Run" appendix for the one-time GCP setup this needs if you
+# switch back to it later. deploy-backend-vps.yml (DigitalOcean + Podman) is
+# dormant the same way, for the same reason (DO also requires a card).
 #
 # Required repo secrets (Settings > Secrets and variables > Actions > Secrets):
 #   GCP_PROJECT_ID          - the GCP project id (not its display name)
@@ -20,11 +22,6 @@
 name: Deploy backend (Cloud Run)
 
 on:
-  push:
-    branches: [master]
-    paths:
-      - backend/**
-      - .github/workflows/deploy-backend-cloudrun.yml
   workflow_dispatch: {}
 
 env:
