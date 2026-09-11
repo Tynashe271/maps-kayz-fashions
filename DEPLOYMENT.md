@@ -127,17 +127,30 @@ To change the API URL, add a custom domain, or edit any of the above later:
 this project's **Settings** tab. Every push to `master` auto-deploys, same
 as Render — no GitHub Actions involved here either.
 
-**Cloudflare Access — tried, skipped**: putting this project behind
-[Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
-as a second layer in front of the app's own staff login would be nice, but
-Cloudflare requires a payment method on file to activate Zero Trust even on
-its **free** ($0/month) plan — same wall this project hit with DigitalOcean
-and Google Cloud earlier, so it's parked rather than done. The admin app's
-own JWT-based staff login is the real access gate in the meantime. To pick
-this back up: Cloudflare dashboard > Zero Trust > add a payment method >
-Access > Applications > Add an application > Self-hosted > domain
-`maps-kayz-admin.pages.dev` > a policy allowing only the staff emails that
-should reach it.
+**Extra access layer: HTTP Basic Auth (done)** — `frontend-admin/functions/_middleware.js`
+gates every request (pages and static assets alike) behind Basic Auth
+before the app's own JWT staff login ever runs. [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
+would have been the more standard choice here, but it requires a payment
+method on file even on its free plan — same wall this project hit with
+DigitalOcean and Google Cloud earlier — so this Pages Function is the
+no-card alternative. It fails open (serves normally) if the two env vars
+below aren't set, so a preview deploy without them configured doesn't lock
+everyone out silently.
+
+Credentials live in this project's **Settings > Variables and secrets**:
+- `BASIC_AUTH_USER` (Text) — currently `admin`
+- `BASIC_AUTH_PASS` (Secret, not re-viewable once saved — rotate it there
+  if it's ever lost, don't try to recover the old value)
+
+Changing either takes effect on the next deploy — after saving, use
+**Manage deployment > Retry deployment** on the latest one rather than
+waiting for the next push.
+
+If a card ever gets added and Cloudflare Access becomes worth switching
+to instead: Cloudflare dashboard > Zero Trust > Access > Applications >
+Add an application > Self-hosted > domain `maps-kayz-admin.pages.dev` > a
+policy allowing only the staff emails that should reach it — then this
+Pages Function can be deleted.
 
 **Gotcha if this project is ever recreated from scratch**: `frontend-admin`
 shares code with `frontend` via a `@store` Vite alias into `../frontend/src`
