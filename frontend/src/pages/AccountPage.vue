@@ -57,8 +57,9 @@ const styleProfile=reactive({clothingSize:'',shoeSize:'',fit:'',colours:'',style
 const prefs=reactive({Email:true,SMS:false,WhatsApp:true,'Browser push':true,'Order updates':true,Promotions:false,'Stock alerts':true,'Price drops':true,'Loyalty updates':true,Newsletter:false})
 const privacy=reactive({twoFactor:false,marketing:false,cookies:true})
 const ticket=reactive({category:'Order problem',order:'',subject:'',message:''})
-onMounted(async()=>{localStorage.removeItem('mk_dashboard');window.addEventListener('mk-sync',handleLiveSync);await Promise.all([syncDashboard(),refreshCart()])})
-onBeforeUnmount(()=>window.removeEventListener('mk-sync',handleLiveSync))
+onMounted(async()=>{localStorage.removeItem('mk_dashboard');window.addEventListener('mk-sync',handleLiveSync);window.addEventListener('mk-open-account-menu',openAccountMenu);await Promise.all([syncDashboard(),refreshCart()])})
+onBeforeUnmount(()=>{window.removeEventListener('mk-sync',handleLiveSync);window.removeEventListener('mk-open-account-menu',openAccountMenu)})
+function openAccountMenu(){mobileNavOpen.value=true}
 function handleLiveSync(event){if(event.detail?.type==='customer'||event.detail?.type==='platform')syncDashboard()}
 watch(wishlist,(next,previous)=>{if(!backendReady.value)return;const ids=new Set(next.map(x=>x.id));previous.filter(x=>x.id&&!ids.has(x.id)).forEach(x=>api.deleteDashboardRecord('wishlists',x.id).catch(()=>{}))},{deep:false})
 watch(looks,(next,previous)=>{if(!backendReady.value)return;const ids=new Set(next.map(x=>x.id));previous.filter(x=>x.id&&!ids.has(x.id)).forEach(x=>api.deleteDashboardRecord('saved-outfits',x.id).catch(()=>{}))},{deep:false})

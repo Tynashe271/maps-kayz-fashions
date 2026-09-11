@@ -121,6 +121,13 @@ function goBack() {
   if (window.history.length > 1) router.back()
   else router.push('/')
 }
+
+function handleBrandClick(event) {
+  if (authStore.user && route.name === 'account' && window.matchMedia('(max-width: 600px)').matches) {
+    event.preventDefault()
+    window.dispatchEvent(new CustomEvent('mk-open-account-menu'))
+  }
+}
 </script>
 
 <template>
@@ -129,7 +136,7 @@ function goBack() {
     <div class="announcement"><span>Complimentary Bulawayo delivery on orders over US$80</span><b>&bull;</b><span>Nationwide delivery available</span></div>
 
     <header class="site-header">
-      <router-link class="brand" to="/" aria-label="Maps Kayz Fashions home"><img class="monogram" src="/logo-mark.svg" alt="" width="64" height="64" /><span class="brand-name">MAPS KAYZ<small>FASHIONS &middot; BYO</small></span></router-link>
+      <router-link class="brand" to="/" aria-label="Maps Kayz Fashions home; opens the account menu on the mobile dashboard" @click="handleBrandClick"><img class="monogram" src="/logo-mark.svg" alt="" width="64" height="64" /><span class="brand-name">MAPS KAYZ<small>FASHIONS &middot; BYO</small></span></router-link>
       <nav :class="{ open: menuOpen }" aria-label="Main navigation">
         <router-link to="/shop" @click="menuOpen = false">Shop</router-link>
         <router-link to="/categories" @click="menuOpen = false">Categories</router-link>
