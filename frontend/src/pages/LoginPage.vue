@@ -23,7 +23,9 @@ async function submit() {
   try {
     const result = await api.login({ email: email.value.trim(), password: password.value })
     setSession(result.user, result.accessToken, remember.value)
-    await router.replace(destination.value || (isStaff.value ? '/admin' : '/account'))
+    // Customer sign-in always starts at the dashboard overview. Staff retain
+    // their separate admin destination.
+    await router.replace(isStaff.value ? '/admin' : '/account')
   } catch (err) {
     error.value = err.status === 401 ? 'That email or password is not correct.' : err.message
   } finally {

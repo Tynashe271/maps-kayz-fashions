@@ -11,7 +11,7 @@ export default function App() {
   return (
     <View style={styles.app}>
       <StatusBar style="light" backgroundColor="#070707" />
-      <View style={styles.appBar}><Pressable accessibilityLabel="Open customer menu" style={styles.menuButton} onPress={() => setMenuOpen(true)}><Text style={styles.menuIcon}>☰</Text></Pressable><Text style={styles.appBarTitle}>MAPS KAYZ</Text><Pressable style={styles.cartButton} onPress={() => setPath('/cart')}><Text style={styles.cartText}>CART</Text></Pressable></View>
+      <View style={styles.appBar}><View style={styles.appBarSpacer} /><Pressable accessibilityLabel="Open customer menu" style={styles.brandButton} onPress={() => setMenuOpen(true)}><View style={styles.brandMark}><Text style={styles.brandMarkText}>MK</Text></View><Text style={styles.appBarTitle}>MAPS KAYZ</Text></Pressable><Pressable style={styles.cartButton} onPress={() => setPath('/cart')}><Text style={styles.cartText}>CART</Text></Pressable></View>
       {React.createElement('iframe', {
         src: new URL(path, STOREFRONT_URL).toString(),
         title: 'Maps Kayz customer storefront',
@@ -38,6 +38,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#070707',
   },
   appBar: { height: 54, paddingHorizontal: 12, borderBottomWidth: 1, borderBottomColor: '#302c2d', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  menuButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }, menuIcon: { color: '#f7f2ea', fontSize: 25 },
+  appBarSpacer: { width: 44 }, brandButton: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 9 }, brandMark: { width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: '#f2a8c4', alignItems: 'center', justifyContent: 'center' }, brandMarkText: { color: '#f2a8c4', fontFamily: 'serif', fontSize: 11 },
   appBarTitle: { color: '#f7f2ea', fontFamily: 'serif', fontSize: 14, letterSpacing: 1.5 }, cartButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }, cartText: { color: '#f2a8c4', fontSize: 9, fontWeight: '800' },
 })
