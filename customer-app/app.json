@@ -34,6 +34,12 @@
           "backgroundColor": "#070707"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "2f4cbe9d-7b0b-45d9-8f86-26ca8a951806"
+      }
+    },
+    "owner": "tinashenyenyesa"
   }
 }
