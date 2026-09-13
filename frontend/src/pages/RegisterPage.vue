@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from '../lib/api'
-import { setSession } from '../lib/auth'
 
 const route = useRoute()
 const router = useRouter()
@@ -22,11 +21,9 @@ async function submit() {
   submitting.value = true
   try {
     await api.register({ email: email.value, password: password.value, referralCode: typeof route.query.ref === 'string' ? route.query.ref : undefined })
-    // Registration doesn't return a session token, so log in immediately with the same credentials.
-    const result = await api.login({ email: email.value, password: password.value })
-    setSession(result.user, result.accessToken)
-    const redirect = route.query.redirect
-    router.push(redirect ? String(redirect) : '/account')
+    // Send the new customer to login rather than straight into the dashboard,
+    // so every session starts with an explicit sign-in.
+    router.push({ path: '/login', query: { ...route.query, registered: '1', email: email.value } })
   } catch (err) {
     error.value = err.message
   } finally {

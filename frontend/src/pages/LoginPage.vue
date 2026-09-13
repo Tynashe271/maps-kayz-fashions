@@ -6,8 +6,9 @@ import { setSession, isStaff } from '../lib/auth'
 
 const route = useRoute()
 const router = useRouter()
-const email = ref('')
+const email = ref(typeof route.query.email === 'string' ? route.query.email : '')
 const password = ref('')
+const justRegistered = computed(() => route.query.registered === '1')
 const showPassword = ref(false)
 const remember = ref(true)
 const submitting = ref(false)
@@ -48,6 +49,7 @@ async function submit() {
         <p class="eyebrow dark">Welcome back</p>
         <h2>Log in to your account</h2>
         <p class="auth-lead">{{ destination ? 'Sign in to continue where you left off.' : 'Enter your details to access your customer dashboard.' }}</p>
+        <div v-if="justRegistered" class="auth-success" role="status"><span>&#10003;</span><p>Account created. Log in to access your dashboard.</p></div>
         <div v-if="error" class="auth-error" role="alert"><span>!</span><p>{{ error }}</p></div>
         <form class="auth-form" @submit.prevent="submit">
           <label for="email">Email address</label>
