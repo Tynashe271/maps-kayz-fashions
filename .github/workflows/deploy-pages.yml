@@ -41,17 +41,6 @@ jobs:
         working-directory: frontend
         env:
           VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
-          # TEMPORARY (2026-09-13): the custom domain (shop.tinashenyenyesa.co.zw)
-          # was pulled from Settings > Pages because WebZim's nameservers
-          # (ns1/ns2.webzim.net) were failing to answer queries for it —
-          # confirmed by querying them directly, not just a propagation
-          # delay. Site is serving from the github.io/<repo>/ subpath in the
-          # meantime, so VITE_BASE_PATH is back on. Once WebZim's DNS is
-          # healthy again and the custom domain is re-added in Settings >
-          # Pages, delete this VITE_BASE_PATH line and this comment — the
-          # site goes back to serving from root and this override would
-          # otherwise break asset paths again.
-          VITE_BASE_PATH: /${{ github.event.repository.name }}/
         run: |
           npm ci
           npm run build
