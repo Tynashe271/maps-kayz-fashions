@@ -113,27 +113,44 @@ avoid (Render's own paid tiers remove it too, for that matter).
 4. Note the Pages URL (Settings > Pages shows it, or add a custom domain
    there) and come back to step 5 to add it to `CORS_ORIGINS`.
 
-**Custom domain (done, pending DNS)**: `shop.tinashenyenyesa.co.zw` is set
-as this repo's Pages custom domain (Settings > Pages > `cname`), and
-`deploy-pages.yml`'s build no longer sets `VITE_BASE_PATH` — a custom
-domain serves from `/`, not `/maps-kayz-fashions/`, so the override from
-the plain-project-site era would now build wrong paths (if the custom
-domain is ever removed, that override needs to come back — see the
-workflow's comment).
+**Custom domain (live)**: `shop.tinashenyenyesa.co.zw` is set as this
+repo's Pages custom domain (Settings > Pages > `cname`), and
+`deploy-pages.yml`'s build doesn't set `VITE_BASE_PATH` — a custom domain
+serves from `/`, not `/maps-kayz-fashions/`, so that override would build
+wrong asset paths while the custom domain is active.
 
 This domain's DNS stays with the registrar
 (WebZim, [cpanel.tinashenyenyesa.co.zw](https://cpanel.tinashenyenyesa.co.zw))
-rather than moving to Cloudflare, so the one remaining step has to be done
-by whoever holds that cPanel login (never an AI agent): in WebZim's cPanel
-> Zone Editor, add a **CNAME record** — name `shop`, target
-`tynashe271.github.io`. Until that record exists and propagates (WebZim
-quotes up to 24h, GitHub's own docs say up to 48h for the DNS check to
-clear), `shop.tinashenyenyesa.co.zw` won't resolve at all — there's no
-interim fallback URL once a custom domain is configured in Pages' own
-settings, so don't be alarmed if it 404s or times out during this window.
-GitHub also won't enable **Enforce HTTPS** (Settings > Pages) until it can
-issue a certificate after the DNS record resolves — check back and toggle
-it on once that option stops being greyed out.
+rather than moving to Cloudflare — a CNAME record there (name `shop`,
+target `tynashe271.github.io`) is what makes it resolve.
+
+**If WebZim's nameservers ever go down again** (happened 2026-09-13 —
+`ns1`/`ns2.webzim.net` stopped answering queries entirely, confirmed by
+querying them directly, not just propagation lag): once a custom domain
+is configured in Pages' settings, GitHub 301-redirects the plain
+`tynashe271.github.io/maps-kayz-fashions/` URL straight to
+`shop.tinashenyenyesa.co.zw` — so that URL is *not* a working fallback on
+its own while WebZim is down, the redirect target is unreachable too.
+There's no automatic failover; restore access manually:
+1. Settings > Pages > remove the custom domain (`cname` back to blank).
+2. In `.github/workflows/deploy-pages.yml`, add back
+   `VITE_BASE_PATH: /${{ github.event.repository.name }}/` under the
+   build step's `env:` (removed in commit d92d2c19) — a plain
+   `github.io/<repo>/` project site needs that subpath baked into asset
+   URLs, the custom domain's root path doesn't.
+3. Push — the site is back within a couple minutes at
+   `https://tynashe271.github.io/maps-kayz-fashions/`.
+
+Once WebZim's nameservers answer again (`nslookup -type=NS
+tinashenyenyesa.co.zw` resolving, and `nslookup shop.tinashenyenyesa.co.zw`
+pointing to GitHub's Pages IPs), reverse both steps: re-add the custom
+domain (`gh api -X PUT repos/Tynashe271/maps-kayz-fashions/pages -f
+cname=shop.tinashenyenyesa.co.zw`, or the Settings > Pages UI), delete the
+`VITE_BASE_PATH` line again, push. GitHub keeps a previously-issued
+certificate cached for a domain it's seen before, so HTTPS is typically
+available immediately on re-adding — no need to wait for **Enforce
+HTTPS** to un-grey before treating the domain as live, just check it
+actually loads over `https://`.
 
 ## 4. The admin app (Cloudflare Pages) (already done)
 
