@@ -135,10 +135,11 @@ function subscribe() {
         <router-link :to="`/product/${product.id}`"><h3>{{ product.name }}</h3></router-link>
         <div class="product-bottom">
           <strong>US${{ Number(product.price).toFixed(2) }}</strong>
-          <button class="add-button" aria-label="Add to cart" :disabled="addStatus[product.id] === 'adding'" @click="quickAdd(product)">＋</button>
+          <button class="add-button" aria-label="Add to cart" :disabled="addStatus[product.id] === 'adding' || product.stock < 1" @click="quickAdd(product)">＋</button>
         </div>
         <p v-if="addStatus[product.id] === 'added'" class="stock-note">Added to cart</p>
         <p v-else-if="addStatus[product.id] && addStatus[product.id] !== 'adding'" class="stock-note out">{{ addStatus[product.id] }}</p>
+        <p v-else-if="product.stock < 1" class="stock-note out">Out of stock</p>
       </article>
     </div>
   </section>

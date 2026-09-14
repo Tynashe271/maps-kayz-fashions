@@ -110,10 +110,12 @@ watch(products, (list) => { visibleProducts.value = list.filter((p) => p.isActiv
             US${{ Number(product.price).toFixed(2) }}
             <s v-if="product.originalPrice" style="color:var(--muted);font-size:12px;margin-left:6px">US${{ Number(product.originalPrice).toFixed(2) }}</s>
           </strong>
-          <button class="shop-add-cart" aria-label="Add to cart" :disabled="addStatus[product.id] === 'adding'" @click="quickAdd(product)">{{ addStatus[product.id] === 'adding' ? 'Adding…' : addStatus[product.id] === 'added' ? 'Added ✓' : 'Add to cart' }}</button>
+          <button class="shop-add-cart" aria-label="Add to cart" :disabled="addStatus[product.id] === 'adding' || product.stock < 1" @click="quickAdd(product)">{{ product.stock < 1 ? 'Out of stock' : addStatus[product.id] === 'adding' ? 'Adding…' : addStatus[product.id] === 'added' ? 'Added ✓' : 'Add to cart' }}</button>
         </div>
         <p v-if="addStatus[product.id] === 'added'" class="stock-note">Added to cart</p>
         <p v-else-if="addStatus[product.id] && addStatus[product.id] !== 'adding'" class="stock-note out">{{ addStatus[product.id] }}</p>
+        <p v-else-if="product.stock < 1" class="stock-note out">Out of stock</p>
+        <p v-else-if="product.stock <= 5" class="stock-note low">Only {{ product.stock }} left</p>
       </article>
     </div>
   </div>
