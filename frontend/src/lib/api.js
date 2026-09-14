@@ -20,20 +20,37 @@ function toQueryString(params = {}) {
   return `?${new URLSearchParams(entries).toString()}`
 }
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+// The backend's free Render instance spins down after 15 minutes idle and
+// takes 30-60s to wake back up on the next request — during that window the
+// platform's own gateway returns 502 (it couldn't reach the container at
+// all yet, so nothing was actually processed) rather than the app ever
+// seeing the request. Retrying is safe for exactly that reason, for any
+// method. Delays sum to ~50s, matching Render's documented wake-up time, so
+// whoever's request happens to wake it up just waits a bit longer instead
+// of seeing an error — pages already show their own "Loading…" state while
+// this runs.
+const COLD_START_RETRY_DELAYS_MS = [2000, 3000, 5000, 8000, 12000, 20000]
+
 async function request(path, { method = 'GET', body, auth = false } = {}) {
   const headers = {}
   if (body !== undefined) headers['Content-Type'] = 'application/json'
   if (auth) Object.assign(headers, authHeaders())
 
   let res
-  try {
-    res = await fetch(`${BASE}${path}`, {
-      method,
-      headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
-    })
-  } catch {
-    throw new Error('Could not reach the server. Please check your connection and try again.')
+  for (let attempt = 0; ; attempt++) {
+    try {
+      res = await fetch(`${BASE}${path}`, {
+        method,
+        headers,
+        body: body !== undefined ? JSON.stringify(body) : undefined,
+      })
+    } catch {
+      throw new Error('Could not reach the server. Please check your connection and try again.')
+    }
+    if (res.status !== 502 || attempt >= COLD_START_RETRY_DELAYS_MS.length) break
+    await sleep(COLD_START_RETRY_DELAYS_MS[attempt])
   }
 
   const text = await res.text()
