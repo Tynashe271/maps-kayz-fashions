@@ -33,10 +33,6 @@ export class CartsService {
     const cart = await this.getCart(cartId);
     const product = await this.products.findOneBy({ id: dto.productId, isActive: true });
     if (!product) throw new NotFoundException(`Product ${dto.productId} not found`);
-    const currentQuantity = cart.items.filter((item) => item.productId === dto.productId).reduce((sum, item) => sum + item.quantity, 0);
-    if (currentQuantity + dto.quantity > product.stock) {
-      throw new BadRequestException(`Only ${product.stock} units are available`);
-    }
     const existing = cart.items.find((item) => item.productId === dto.productId && item.size === dto.size && item.colour === dto.colour);
     if (existing) existing.quantity += dto.quantity;
     else cart.items = [...cart.items, {
@@ -50,9 +46,6 @@ export class CartsService {
     const cart = await this.getCart(cartId);
     const item = cart.items.find((line) => line.id === itemId);
     if (!item) throw new NotFoundException(`Cart item ${itemId} not found`);
-    const product = await this.products.findOneBy({ id: item.productId });
-    const otherQuantity = cart.items.filter((line) => line.productId === item.productId && line.id !== itemId).reduce((sum,line)=>sum+line.quantity,0);
-    if (!product || dto.quantity + otherQuantity > product.stock) throw new BadRequestException('Requested quantity is unavailable');
     item.quantity = dto.quantity;
     return this.withTotals(await this.carts.save(cart));
   }

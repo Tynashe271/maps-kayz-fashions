@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { api } from '../lib/api'
 import { addToCart } from '../lib/cart'
@@ -42,10 +42,8 @@ function handleSync(event){if(event.detail?.resource==='products'&&(!event.detai
 onMounted(()=>window.addEventListener('mk-sync',handleSync))
 onBeforeUnmount(()=>window.removeEventListener('mk-sync',handleSync))
 
-const maxQuantity = computed(() => product.value?.stock ?? 1)
-
 function changeQuantity(delta) {
-  quantity.value = Math.min(maxQuantity.value, Math.max(1, quantity.value + delta))
+  quantity.value = Math.max(1, quantity.value + delta)
 }
 
 async function submitAdd() {
@@ -116,16 +114,14 @@ async function saveToWishlist() {
         <div class="qty-control">
           <button type="button" @click="changeQuantity(-1)" :disabled="quantity <= 1">&minus;</button>
           <span>{{ quantity }}</span>
-          <button type="button" @click="changeQuantity(1)" :disabled="quantity >= maxQuantity">+</button>
+          <button type="button" @click="changeQuantity(1)">+</button>
         </div>
-        <span v-if="product.stock < 1" class="stock-note out">Out of stock</span>
-        <span v-else-if="product.stock <= 5" class="stock-note low">Only {{ product.stock }} left in stock</span>
-        <span v-else class="stock-note">{{ product.stock }} in stock</span>
+        <span class="stock-note">Available to order</span>
       </div>
 
       <div class="hero-actions" style="margin:0">
-        <button class="gold-button" type="button" :disabled="product.stock < 1 || addState === 'adding'" @click="submitAdd">
-          {{ product.stock < 1 ? 'Out of stock' : addState === 'adding' ? 'Adding…' : 'Add to cart' }}
+        <button class="gold-button" type="button" :disabled="addState === 'adding'" @click="submitAdd">
+          {{ addState === 'adding' ? 'Adding…' : 'Add to cart' }}
         </button>
         <router-link v-if="addState === 'added'" to="/cart" class="hero-link">View cart <span>&rarr;</span></router-link>
         <button class="btn btn-ghost" type="button" :disabled="savedState === 'saving' || savedState === 'saved'" @click="saveToWishlist">{{ savedState === 'saved' ? 'Saved to wishlist ✓' : savedState === 'saving' ? 'Saving…' : 'Save to wishlist' }}</button>
