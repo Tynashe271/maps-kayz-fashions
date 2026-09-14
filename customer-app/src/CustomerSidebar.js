@@ -1,30 +1,16 @@
 import React from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 
-export const customerMenu = [
-  ['/', 'Home'],
-  ['/shop', 'Shop'],
-  ['/categories', 'Categories'],
-  ['/cart', 'My Cart'],
-  ['/account', 'Overview'],
-  ['/account?tab=orders', 'My Orders'],
-  ['/account?tab=track', 'Track Order'],
-  ['/account?tab=returns', 'Returns & Exchanges'],
-  ['/account?tab=wishlist', 'Wishlist'],
-  ['/account?tab=looks', 'Saved Looks'],
-  ['/account?tab=recent', 'Recently Viewed'],
-  ['/account?tab=style', 'My Sizes & Style'],
-  ['/account?tab=loyalty', 'Loyalty & Rewards'],
-  ['/account?tab=coupons', 'Coupons'],
-  ['/account?tab=credit', 'Gift Cards & Credit'],
-  ['/account?tab=addresses', 'Addresses'],
-  ['/account?tab=notifications', 'Notifications'],
-  ['/account?tab=reviews', 'Reviews & Questions'],
-  ['/account?tab=referrals', 'Referrals'],
-  ['/account?tab=support', 'Support Centre'],
-  ['/account?tab=profile', 'Profile'],
-  ['/account?tab=security', 'Privacy & Security'],
+export const customerMenuGroups = [
+  { title: 'Dashboard', items: [['/account', 'Overview']] },
+  { title: 'Shopping', items: [['/', 'Landing Page'], ['/shop', 'Shop'], ['/categories', 'Categories'], ['/account?tab=bag', 'My Cart']] },
+  { title: 'Orders', items: [['/account?tab=orders', 'My Orders'], ['/account?tab=track', 'Track Order'], ['/account?tab=returns', 'Returns & Exchanges']] },
+  { title: 'Saved', items: [['/account?tab=wishlist', 'Wishlist'], ['/account?tab=looks', 'Saved Looks'], ['/account?tab=recent', 'Recently Viewed'], ['/account?tab=style', 'My Sizes & Style']] },
+  { title: 'Benefits', items: [['/account?tab=loyalty', 'Loyalty & Rewards'], ['/account?tab=coupons', 'Coupons'], ['/account?tab=credit', 'Gift Cards & Credit'], ['/account?tab=referrals', 'Referrals']] },
+  { title: 'Account', items: [['/account?tab=profile', 'Profile'], ['/account?tab=addresses', 'Addresses'], ['/account?tab=notifications', 'Notifications'], ['/account?tab=reviews', 'Reviews & Questions'], ['/account?tab=support', 'Support Centre'], ['/account?tab=security', 'Privacy & Security']] },
 ]
+
+export const customerMenu = customerMenuGroups.flatMap((group) => group.items)
 
 export function CustomerSidebar({ open, onClose, onNavigate }) {
   if (!open) return null
@@ -34,7 +20,7 @@ export function CustomerSidebar({ open, onClose, onNavigate }) {
       <View style={styles.drawer}>
         <View style={styles.heading}><View><Text style={styles.eyebrow}>MAPS KAYZ</Text><Text style={styles.title}>Customer menu</Text></View><Pressable accessibilityLabel="Close menu" style={styles.close} onPress={onClose}><Text style={styles.closeText}>×</Text></Pressable></View>
         <ScrollView contentContainerStyle={styles.menu}>
-          {customerMenu.map(([path, label], index) => <Pressable key={path} style={styles.item} onPress={() => { onNavigate(path); onClose() }}><Text style={styles.number}>{String(index + 1).padStart(2, '0')}</Text><Text style={styles.label}>{label}</Text><Text style={styles.arrow}>→</Text></Pressable>)}
+          {customerMenuGroups.map((group) => <View key={group.title} style={styles.group}><Text style={styles.groupTitle}>{group.title}</Text>{group.items.map(([path, label]) => { const index = customerMenu.findIndex(([itemPath]) => itemPath === path); return <Pressable key={path} style={styles.item} onPress={() => { onNavigate(path); onClose() }}><Text style={styles.number}>{String(index + 1).padStart(2, '0')}</Text><Text style={styles.label}>{label}</Text><Text style={styles.arrow}>→</Text></Pressable> })}</View>)}
           <Pressable style={styles.shopButton} onPress={() => { onNavigate('/shop'); onClose() }}><Text style={styles.shopText}>CONTINUE SHOPPING →</Text></Pressable>
           <Pressable style={styles.logoutButton} onPress={() => { onNavigate('/account'); onClose() }}><Text style={styles.logoutText}>ACCOUNT & LOG OUT</Text></Pressable>
         </ScrollView>
@@ -52,6 +38,8 @@ const styles = StyleSheet.create({
   title: { marginTop: 6, color: '#f7f2ea', fontFamily: 'serif', fontSize: 22 },
   close: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }, closeText: { color: '#f7f2ea', fontSize: 30, lineHeight: 32 },
   menu: { padding: 18, paddingBottom: 40 },
+  group: { marginBottom: 22 },
+  groupTitle: { marginBottom: 5, color: '#f2a8c4', fontSize: 8, fontWeight: '800', letterSpacing: 1.6, textTransform: 'uppercase' },
   item: { minHeight: 49, borderBottomWidth: 1, borderBottomColor: '#252223', flexDirection: 'row', alignItems: 'center', gap: 12 },
   number: { width: 22, color: '#776f70', fontSize: 9 }, label: { flex: 1, color: '#d8d2ce', fontSize: 12 }, arrow: { color: '#f2a8c4', fontSize: 15 },
   shopButton: { minHeight: 50, marginTop: 22, backgroundColor: '#f2a8c4', alignItems: 'center', justifyContent: 'center' }, shopText: { color: '#090707', fontSize: 10, fontWeight: '800', letterSpacing: 1 },

@@ -17,12 +17,14 @@ import { CartsModule } from './carts/carts.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { SyncModule } from './sync/sync.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
     SyncModule,
+    NotificationsModule,
     OperationsModule,
     PlatformModule,
     AuthModule,

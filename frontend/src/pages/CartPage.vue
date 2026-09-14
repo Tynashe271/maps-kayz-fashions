@@ -58,7 +58,7 @@ async function remove(item) {
   <div v-else class="cart-page">
     <div>
       <div v-for="item in cartStore.items" :key="item.id" class="cart-line">
-        <div class="cart-line-media"><div class="product-swatch" style="height:100%;font-size:11px"><span>{{ item.name }}</span></div></div>
+        <div class="cart-line-media"><img v-if="item.imageUrl" :src="item.imageUrl" :alt="item.name" class="product-photo" /><div v-else class="product-swatch" style="height:100%;font-size:11px"><span>{{ item.name }}</span></div></div>
         <div>
           <h4>{{ item.name }}</h4>
           <p class="cart-line-meta">

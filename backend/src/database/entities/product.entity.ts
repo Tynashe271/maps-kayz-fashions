@@ -41,4 +41,7 @@ export class Product {
 
   @Column({ default: true })
   isActive: boolean;
+
+  @Column({ type: 'varchar', name: 'image_url', nullable: true })
+  imageUrl: string | null;
 }

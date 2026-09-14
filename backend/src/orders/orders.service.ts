@@ -10,6 +10,7 @@ import { Customer } from '../database/entities/customer.entity';
 import { ReturnRequest, ReturnStatus } from '../database/entities/return-request.entity';
 import { CreateOrderDto, UpdateOrderDto, OrderLookupDto, CreateReturnRequestDto } from './dto';
 import { SyncService } from '../sync/sync.service';
+import { NotificationsService, ReceiptLine } from '../notifications/notifications.service';
 
 const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   [OrderStatus.Pending]: [OrderStatus.AwaitingPayment, OrderStatus.PaymentConfirmed, OrderStatus.Cancelled],
@@ -41,6 +42,7 @@ export class OrdersService {
     @InjectRepository(ReturnRequest) private readonly returns: Repository<ReturnRequest>,
     private readonly dataSource: DataSource,
     private readonly sync: SyncService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   // Public order tracking: order number + the email on the order's customer record
@@ -102,7 +104,8 @@ export class OrdersService {
     }
     if (!customerId) throw new BadRequestException('Customer details are required');
 
-    return this.dataSource.transaction('SERIALIZABLE', async (manager) => {
+    const lowStockCrossings: { productId: string; productName: string; sku: string; branchId: string; available: number; reorderLevel: number }[] = [];
+    const result = await this.dataSource.transaction('SERIALIZABLE', async (manager) => {
       const productIds = [...quantities.keys()];
       const products = await manager.find(Product, { where: { id: In(productIds), isActive: true } });
       if (products.length !== productIds.length) throw new BadRequestException('One or more products are unavailable');
@@ -145,6 +148,7 @@ export class OrdersService {
       });
       for (const [productId, quantity] of quantities) {
         const stock = inventoryByProduct.get(productId)!;
+        const previousAvailable = stock.available;
         stock.available -= quantity;
         stock.reserved += quantity;
         await manager.save(stock);
@@ -152,6 +156,9 @@ export class OrdersService {
         product.stock = Math.max(0, product.stock - quantity);
         await manager.save(product);
         await manager.save(manager.create(StockMovement, { productId, branchId, quantity, type: StockMovementType.Reservation, reason: 'Order checkout' }));
+        if (this.notifications.shouldAlert(previousAvailable, stock.available, stock.reorderLevel)) {
+          lowStockCrossings.push({ productId, productName: product.name, sku: product.sku, branchId, available: stock.available, reorderLevel: stock.reorderLevel });
+        }
       }
       const saved=await manager.save(order);
       this.sync.emit({type:'order',resource:'orders',action:'created',id:saved.id});
@@ -160,13 +167,18 @@ export class OrdersService {
       const whatsapp=this.buildWhatsAppPayload(saved,nameById);
       return {...saved,customer,whatsapp:{...whatsapp,status:WhatsAppStatus.MessagePrepared},paymentLink:whatsapp.paymentLink};
     });
+    // Fired after the transaction commits — a WhatsApp send is network I/O
+    // and has no business holding the DB transaction (or its row locks) open.
+    for (const crossing of lowStockCrossings) await this.notifications.recordLowStockAlert(crossing);
+    return result;
   }
 
   // The payment page the WhatsApp message links to lives in the customer
   // storefront (frontend/src/pages/PaymentPage.vue), served from the same
   // dev port the storefront already runs on — see frontend/vite.config.js.
   buildPaymentLink(orderNumber: string) {
-    return `http://localhost:9990/pay/${orderNumber}`;
+    const storefront = process.env.STOREFRONT_URL || (process.env.NODE_ENV === 'production' ? 'https://shop.tinashenyenyesa.co.zw' : 'http://localhost:9990');
+    return `${storefront.replace(/\/$/, '')}/pay/${orderNumber}`;
   }
 
   private buildWhatsAppPayload(order: Order, nameById: Map<string, string>) {
@@ -275,7 +287,35 @@ export class OrdersService {
     }
     const saved = await this.orders.save(order);
     this.sync.emit({ type: 'order', resource: 'orders', action: 'updated', id: saved.id });
+    await this.sendReceipt(saved.orderNumber).catch(() => undefined); // never fail payment confirmation over a receipt/WhatsApp hiccup
     return saved;
+  }
+
+  private async receiptLines(order: Order): Promise<ReceiptLine[]> {
+    const productIds = [...new Set(order.items.map((item) => item.productId))];
+    const products = await this.orders.manager.find(Product, { where: { id: In(productIds) } });
+    const byId = new Map(products.map((product) => [product.id, product]));
+    return order.items.map((item) => {
+      const product = byId.get(item.productId);
+      return { name: product?.name || item.productId, sku: product?.sku || item.productId, quantity: item.quantity, unitPrice: Number(item.unitPrice), total: Number(item.total) };
+    });
+  }
+
+  // GET /orders/:orderNumber/receipt — public, email-verified like the rest
+  // of the order-tracking routes. Always available on demand (doesn't
+  // require verifyPayment to have run first) — just doesn't persist or send.
+  async getReceipt(orderNumber: string, email: string) {
+    const order = await this.requireOrderByNumberAndEmail(orderNumber, email);
+    const customer = await this.customers.findOneBy({ id: order.customerId });
+    return this.notifications.buildReceiptData(order, customer, await this.receiptLines(order));
+  }
+
+  // POST /admin/orders/:orderNumber/send-receipt — staff "Resend receipt",
+  // and the same path verifyPayment triggers automatically once paid.
+  async sendReceipt(orderNumber: string) {
+    const order = await this.findByOrderNumber(orderNumber);
+    const customer = await this.customers.findOneBy({ id: order.customerId });
+    return this.notifications.recordAndSendReceipt(order, customer, await this.receiptLines(order));
   }
 
   // Failure path of POST /webhooks/payment. Payment providers can retry or

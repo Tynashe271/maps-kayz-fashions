@@ -26,6 +26,9 @@ export class OperationsController {
   @Get('inventory/movements')
   listMovements(@Query('productId') productId?: string) { return this.operations.listStockMovements(productId); }
 
+  @Get('inventory/low-stock')
+  listLowStock() { return this.operations.listLowStock(); }
+
   @Get('deliveries')
   listDeliveries() { return this.operations.listDeliveries(); }
 

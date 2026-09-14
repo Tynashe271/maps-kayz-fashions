@@ -128,7 +128,8 @@ function subscribe() {
     <div v-else class="product-grid">
       <article v-for="product in featured" :key="product.id" class="product-card">
         <router-link :to="`/product/${product.id}`" class="product-media">
-          <div class="product-swatch"><span>{{ product.name }}</span></div>
+          <img v-if="product.imageUrl" :src="product.imageUrl" :alt="product.name" class="product-photo" loading="lazy" />
+          <div v-else class="product-swatch"><span>{{ product.name }}</span></div>
           <span v-if="product.isFeatured" class="product-tag">FEATURED</span>
         </router-link>
         <p class="product-category">{{ product.category }}</p>

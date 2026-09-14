@@ -54,7 +54,8 @@
 .field-help{color:var(--muted);font-size:11px}
 .form-actions{display:flex;align-items:center;gap:14px;margin-top:8px}
 
-/* -- product placeholder swatch (backend has no image field) -- */
+/* -- product photo, with a placeholder swatch for products with no image yet -- */
+.product-photo{width:100%;height:100%;object-fit:cover;display:block}
 .product-swatch{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#241d20,#171213 60%);color:var(--pink);font:400 15px 'Libre Baskerville';letter-spacing:.04em;text-align:center;padding:10px}
 .product-swatch span{opacity:.85}
 
@@ -205,8 +206,47 @@
 @media(max-width:600px){.auth-visual{min-height:390px}.auth-visual-copy{left:7vw;right:7vw}.auth-visual-copy h1{font-size:43px}.auth-panel{padding:55px 7vw}.auth-panel h2{font-size:30px}.customer-dashboard{padding:55px 5vw 85px}.dashboard-hero{display:block}.profile-chip{margin-top:30px}.dashboard-sidebar{display:flex;flex-direction:row;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x proximity;position:sticky;top:0;z-index:8;background:#080808;margin:0 -5vw;padding:0 5vw}.dashboard-sidebar>p{display:none}.dashboard-sidebar a,.dashboard-sidebar button{min-width:max-content;padding:16px 18px;scroll-snap-align:start}.dashboard-sidebar button.active{background:rgba(242,168,196,.08)}.dashboard-sidebar-shop{margin-bottom:0}.dashboard-summary{grid-template-columns:1fr}.dashboard-summary article:last-child{grid-column:auto}.dashboard-two-col{grid-template-columns:1fr}.bag-ready,.bag-empty{align-items:flex-start;flex-wrap:wrap}.dashboard-button{width:100%;text-align:center}.account-details dl{grid-template-columns:1fr}.account-details dl div{border-bottom:1px solid var(--line)}}
 
 /* Customer dashboard tabs */
+.dashboard-overview-taskbar{display:grid;grid-template-columns:repeat(4,1fr);min-height:78px;margin-bottom:16px;border:1px solid var(--line);background:#090909}.dashboard-overview-taskbar a,.dashboard-overview-taskbar button{border:0;background:none;color:#777071;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;min-width:0;font:700 11px 'DM Sans';cursor:pointer}.dashboard-overview-taskbar i{display:block;width:5px;height:5px;border-radius:50%;background:#514b4c}.dashboard-overview-taskbar .active{color:#f7f2ea}.dashboard-overview-taskbar .active i{width:26px;border-radius:3px;background:var(--pink)}
+
+/* Dedicated presentation used when the storefront is hosted inside the
+   customer app shell. It intentionally behaves like a phone screen rather
+   than a squeezed version of the public website. */
+html.mobile-app-embedded,html.mobile-app-embedded body,html.mobile-app-embedded #app{width:100%;max-width:100%;min-height:100%;overflow-x:hidden;background:#070707}
+html.mobile-app-embedded .announcement,html.mobile-app-embedded .site-header,html.mobile-app-embedded footer{display:none!important}
+html.mobile-app-embedded.mobile-app-landing .site-header{display:flex!important;height:auto;min-height:112px;padding:14px 16px;align-content:center;align-items:center;gap:10px;flex-wrap:wrap;background:#090909}
+html.mobile-app-embedded.mobile-app-landing .site-header>.brand{display:none}
+html.mobile-app-embedded.mobile-app-landing .site-header nav{display:flex;position:static;inset:auto;order:1;width:100%;height:auto;max-height:none;padding:0 0 12px;gap:0;justify-content:space-between;border-bottom:1px solid var(--line);background:none;transform:none}
+html.mobile-app-embedded.mobile-app-landing .site-header nav a{display:flex;min-height:42px;align-items:center;padding:0 10px;font-size:12px}
+html.mobile-app-embedded.mobile-app-landing .site-header nav a:last-child{color:var(--pink)}
+html.mobile-app-embedded.mobile-app-landing .header-actions{order:2;width:100%;margin:0;gap:14px;justify-content:flex-end;font-size:11px}
+html.mobile-app-embedded.mobile-app-landing .header-actions>a,html.mobile-app-embedded.mobile-app-landing .header-actions>a:first-child{display:flex;min-height:42px;align-items:center;white-space:nowrap}
+html.mobile-app-embedded.mobile-app-landing .header-actions b{width:26px;height:26px;margin-left:6px}
+html.mobile-app-embedded.mobile-app-landing .menu-button{display:none}
+html.mobile-app-embedded .customer-dashboard{max-width:none;padding:24px 14px calc(104px + env(safe-area-inset-bottom))}
+html.mobile-app-embedded .dashboard-hero{display:block;padding:8px 4px 24px}
+html.mobile-app-embedded .dashboard-hero h1{max-width:100%;font-size:clamp(30px,9.5vw,42px);line-height:1.08;margin-bottom:14px;overflow-wrap:anywhere;word-break:break-word}
+html.mobile-app-embedded .dashboard-hero h1 em{display:inline;overflow-wrap:anywhere;word-break:break-word}
+html.mobile-app-embedded .profile-chip{margin-top:22px;padding:14px;background:#111;border:1px solid var(--line)}
+html.mobile-app-embedded .dashboard-layout{display:block;padding-top:18px}
+html.mobile-app-embedded .dashboard-menu-button{display:flex}
+html.mobile-app-embedded .dashboard-card{padding:19px;margin-bottom:12px}
+html.mobile-app-embedded .dashboard-summary.four{grid-template-columns:1fr 1fr;gap:10px}
+html.mobile-app-embedded .dashboard-summary article{min-height:125px;padding:17px}
+html.mobile-app-embedded .dashboard-summary strong{font-size:30px}
+html.mobile-app-embedded .dashboard-grid-main,html.mobile-app-embedded .dashboard-two-col,html.mobile-app-embedded .wishlist-grid,html.mobile-app-embedded .coupon-grid,html.mobile-app-embedded .form-grid-3,html.mobile-app-embedded .form-grid-2{grid-template-columns:1fr}
+html.mobile-app-embedded .dashboard-overview-taskbar{position:fixed;left:0;right:0;bottom:0;z-index:30;min-height:72px;margin:0;padding-bottom:env(safe-area-inset-bottom);border-width:1px 0 0;box-shadow:0 -12px 34px #000b}
+html.mobile-app-embedded .whatsapp{right:14px;bottom:calc(16px + env(safe-area-inset-bottom));width:46px;height:46px;font-size:10px;box-shadow:0 7px 22px #0009}
+html.mobile-app-embedded:has(.dashboard-overview-taskbar) .whatsapp{bottom:calc(88px + env(safe-area-inset-bottom))}
+html.mobile-app-embedded button,html.mobile-app-embedded .btn,html.mobile-app-embedded input,html.mobile-app-embedded select,html.mobile-app-embedded textarea{min-height:46px}
+html.mobile-app-embedded .auth-shell{min-height:100svh}
+html.mobile-app-embedded .auth-visual{display:none}
+html.mobile-app-embedded .auth-panel{min-height:100svh;padding:38px 24px;justify-content:center}
+html.mobile-app-embedded .auth-panel h2{font-size:34px}
+html.mobile-app-embedded .page-header{padding:34px 18px 24px}
+html.mobile-app-embedded .cart-page,html.mobile-app-embedded .auth-page{padding-left:14px;padding-right:14px}
 .page-back-button{display:flex;align-items:center;gap:10px;width:max-content;margin:24px 5vw 0;padding:9px 0;border-bottom:1px solid var(--line);color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;transition:color .2s,border-color .2s}.page-back-button span{font-size:17px}.page-back-button:hover{color:#fff;border-color:var(--pink)}.admin-back-button{margin:0 0 26px}
 .dashboard-sidebar button.active{color:#fff;border-bottom-color:var(--pink)}
+.dashboard-sidebar-heading{display:block;margin:22px 0 5px;color:var(--pink);font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}.dashboard-sidebar-heading:first-of-type{margin-top:0}
 .dashboard-sidebar>.dashboard-sidebar-section{margin-top:28px}
 /* Always-visible way back to the shop from anywhere in the dashboard — the
    only other route there (Overview's "Continue shopping" card) disappears
@@ -244,6 +284,7 @@
    as the menu having disappeared. Declared after the 600px block above so
    these win the cascade at equal specificity. */
 @media(max-width:600px){
+  .dashboard-hero h1,.dashboard-hero h1 em{max-width:100%;overflow-wrap:anywhere;word-break:break-word}
   .dashboard-menu-button{display:flex;align-items:center;gap:10px;width:100%;margin:0 0 18px;padding:13px 16px;background:#141414;border:1px solid var(--line);color:#f7f2ea;font-size:11px;text-transform:uppercase;letter-spacing:.08em;cursor:pointer}
   .dashboard-menu-button span{background:var(--pink);color:#111;border-radius:50%;width:20px;height:20px;flex:none;display:inline-grid;place-items:center;font-size:10px;text-transform:none}
   .dashboard-layout.nav-open .dashboard-nav-backdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:35}
@@ -273,7 +314,7 @@
   .product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 10px;margin-right:0;padding-right:0;overflow:visible}
   .product-card{min-width:0}.product-media{height:58vw;max-height:310px}.product-card h3{font-size:15px}.product-bottom{align-items:flex-start;gap:8px;flex-direction:column}.shop-add-cart{width:100%;min-height:42px}
   .collection-card,.collection-card:last-child{height:390px}.collection-copy{left:20px;right:20px}
-  .storefront footer{gap:28px 20px}.whatsapp{right:16px;bottom:16px;width:52px;height:52px}
+  .storefront footer{gap:28px 20px}.whatsapp{right:14px;bottom:calc(14px + env(safe-area-inset-bottom));width:48px;height:48px;font-size:10px}
   .shop-toolbar{padding-left:5vw;padding-right:5vw;align-items:stretch}.shop-filters{display:grid;grid-template-columns:1fr;gap:10px;width:100%}.shop-filters form,.shop-filters input,.shop-filters select,.shop-filters button{width:100%}.shop-count{align-self:flex-start}
   .checkout-page,.auth-page,.cart-page{padding-left:5vw;padding-right:5vw}.checkout-summary{padding:18px}.checkout-summary-line{gap:16px}.checkout-summary-line span{min-width:0;overflow-wrap:anywhere}
   .form-grid{grid-template-columns:1fr}.form-grid .span-2{grid-column:auto}.form-actions{align-items:stretch;flex-direction:column}.form-actions>*{width:100%;justify-content:center;text-align:center}

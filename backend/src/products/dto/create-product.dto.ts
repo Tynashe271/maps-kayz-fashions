@@ -49,4 +49,9 @@ export class CreateProductDto {
   @ApiProperty({ example: 'Elegant evening wear for premium occasions.' })
   @IsString()
   description: string;
+
+  @ApiProperty({ example: 'https://cdn.example.com/products/mk-w-formal-101.jpg', required: false })
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
 }

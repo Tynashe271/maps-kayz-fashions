@@ -40,6 +40,12 @@ export class OrdersController {
     return this.ordersService.lookupByOrderNumber(orderNumber, query.email);
   }
 
+  @Get(':orderNumber/receipt')
+  @ApiOperation({ summary: 'Get a receipt for an order (public; email-verified)' })
+  getReceipt(@Param('orderNumber') orderNumber: string, @Query() query: OrderEmailQueryDto) {
+    return this.ordersService.getReceipt(orderNumber, query.email);
+  }
+
   @Post(':orderNumber/payment-proof')
   @ApiOperation({ summary: 'Submit a manual EFT/ZIPIT payment proof/reference for an order (email-verified)' })
   submitPaymentProof(@Param('orderNumber') orderNumber: string, @Body() dto: PaymentProofDto) {

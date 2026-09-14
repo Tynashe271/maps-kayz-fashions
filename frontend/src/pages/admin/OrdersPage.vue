@@ -15,6 +15,8 @@ const updateError = ref({})
 const verifying = ref({})
 const resending = ref({})
 const actionNote = ref({})
+const sendingReceipt = ref({})
+const receiptResult = ref({})
 
 async function load() {
   loading.value = true
@@ -92,6 +94,22 @@ async function verifyPayment(order) {
   }
 }
 
+// "Send receipt" — records a receipt for this order and, if the customer
+// has a phone number and the WhatsApp Business Cloud API is configured
+// (see whatsapp/whatsapp.service.ts), sends it to them directly.
+async function sendReceipt(order) {
+  sendingReceipt.value = { ...sendingReceipt.value, [order.id]: true }
+  updateError.value = { ...updateError.value, [order.id]: '' }
+  try {
+    const { whatsapp } = await api.sendReceipt(order.orderNumber)
+    receiptResult.value = { ...receiptResult.value, [order.id]: whatsapp.sent ? 'Sent via WhatsApp' : whatsapp.reason === 'not_configured' ? 'Receipt saved (WhatsApp not configured)' : whatsapp.reason === 'no_customer_phone' ? 'Receipt saved (no customer phone on file)' : `Receipt saved (WhatsApp send failed: ${whatsapp.reason})` }
+  } catch (err) {
+    updateError.value = { ...updateError.value, [order.id]: err.message }
+  } finally {
+    sendingReceipt.value = { ...sendingReceipt.value, [order.id]: false }
+  }
+}
+
 // "Resend WhatsApp summary" — regenerates the same order-confirmation link
 // the customer got at checkout, for staff to forward manually if needed.
 async function resendWhatsApp(order) {
@@ -158,7 +176,11 @@ async function resendWhatsApp(order) {
                 <button class="btn btn-ghost btn-sm" type="button" :disabled="resending[order.id]" @click="resendWhatsApp(order)">
                   {{ resending[order.id] ? 'Opening…' : 'Resend WhatsApp' }}
                 </button>
+                <button v-if="order.paymentStatus === 'PAID'" class="btn btn-ghost btn-sm" type="button" :disabled="sendingReceipt[order.id]" @click="sendReceipt(order)">
+                  {{ sendingReceipt[order.id] ? 'Sending…' : 'Send receipt' }}
+                </button>
               </div>
+              <p v-if="receiptResult[order.id]" class="stock-note">{{ receiptResult[order.id] }}</p>
               <p v-if="updateError[order.id]" class="stock-note out">{{ updateError[order.id] }}</p>
             </td>
           </tr>

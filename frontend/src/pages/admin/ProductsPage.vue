@@ -17,7 +17,7 @@ const formError = ref('')
 const confirmingDeleteId = ref(null)
 
 function emptyForm() {
-  return { name: '', sku: '', category: '', brand: 'Maps Kayz', price: '', originalPrice: '', stock: '', isFeatured: false, colours: '', sizes: '', description: '' }
+  return { name: '', sku: '', category: '', brand: 'Maps Kayz', price: '', originalPrice: '', stock: '', isFeatured: false, colours: '', sizes: '', description: '', imageUrl: '' }
 }
 const form = ref(emptyForm())
 
@@ -64,6 +64,7 @@ function openEdit(product) {
     colours: (product.colours || []).join(', '),
     sizes: (product.sizes || []).join(', '),
     description: product.description,
+    imageUrl: product.imageUrl ?? '',
   }
   formError.value = ''
   showForm.value = true
@@ -93,6 +94,7 @@ async function submitForm() {
     description: form.value.description,
   }
   if (form.value.originalPrice !== '' && form.value.originalPrice !== null) dto.originalPrice = Number(form.value.originalPrice)
+  if (form.value.imageUrl) dto.imageUrl = form.value.imageUrl.trim()
   saving.value = true
   try {
     if (editingId.value) await api.updateProduct(editingId.value, dto)
@@ -148,6 +150,9 @@ async function confirmDelete(product) {
       <div class="field field-checkbox"><input id="featured" v-model="form.isFeatured" type="checkbox" /><label for="featured" style="text-transform:none">Featured product</label></div>
       <div class="field"><label>Colours (comma separated)</label><input v-model="form.colours" placeholder="Black, Gold" required /></div>
       <div class="field"><label>Sizes (comma separated)</label><input v-model="form.sizes" placeholder="S, M, L" required /></div>
+      <div class="field span-2"><label>Image URL</label><input v-model="form.imageUrl" type="url" placeholder="https://…" />
+        <img v-if="form.imageUrl" :src="form.imageUrl" alt="" style="margin-top:6px;max-height:80px;border-radius:6px" @error="$event.target.style.display='none'" />
+      </div>
       <div class="field span-2"><label>Description</label><textarea v-model="form.description" required></textarea></div>
       <div class="form-actions span-2">
         <button class="btn btn-primary" type="submit" :disabled="saving">{{ saving ? 'Saving…' : 'Save product' }}</button>
@@ -169,9 +174,10 @@ async function confirmDelete(product) {
   <div v-else-if="!products.length" class="empty-state"><h3>No products</h3></div>
   <div v-else class="table-wrap">
     <table class="data-table">
-      <thead><tr><th>Name</th><th>SKU</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr></thead>
+      <thead><tr><th></th><th>Name</th><th>SKU</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr></thead>
       <tbody>
         <tr v-for="p in products" :key="p.id">
+          <td><img v-if="p.imageUrl" :src="p.imageUrl" alt="" style="width:36px;height:36px;object-fit:cover;border-radius:6px" @error="$event.target.style.visibility='hidden'" /></td>
           <td>{{ p.name }}<div v-if="p.isFeatured" class="status-pill tone-pink" style="margin-top:4px">Featured</div></td>
           <td>{{ p.sku }}</td>
           <td>{{ p.category }}</td>

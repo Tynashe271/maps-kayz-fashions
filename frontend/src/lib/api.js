@@ -89,6 +89,8 @@ export const api = {
   cancelOrder: (orderNumber, dto) => request(`/orders/${orderNumber}/cancel`, { method: 'POST', body: dto }),
   resendWhatsAppLink: (orderNumber) => request(`/orders/${orderNumber}/whatsapp-link`, { method: 'POST', auth: true }),
   regeneratePaymentLink: (orderNumber) => request(`/orders/${orderNumber}/payment-link`, { method: 'POST', auth: true }),
+  getReceipt: (orderNumber, email) => request(`/orders/${orderNumber}/receipt${toQueryString({ email })}`),
+  sendReceipt: (orderNumber) => request(`/admin/orders/${orderNumber}/send-receipt`, { method: 'POST', auth: true }),
 
   // ---- shopping carts (public, session-based via cart id) ----
   createCart: (dto = {}) => request('/carts', { method: 'POST', body: dto }),
@@ -100,6 +102,8 @@ export const api = {
 
   // ---- whatsapp ----
   sendOrderMessage: (dto) => request('/whatsapp/order-message', { method: 'POST', body: dto }),
+  getWhatsAppStatus: () => request('/whatsapp/status', { auth: true }),
+  sendWhatsAppTestMessage: (dto) => request('/whatsapp/test-message', { method: 'POST', body: dto, auth: true }),
 
   // ---- promotions (GET public; write staff-only) ----
   listPromotions: () => request('/promotions'),
@@ -130,6 +134,24 @@ export const api = {
   listReturns: () => request('/operations/returns', { auth: true }),
   createReturn: (dto) => request('/operations/returns', { method: 'POST', body: dto, auth: true }),
   updateReturn: (id, dto) => request(`/operations/returns/${id}`, { method: 'PATCH', body: dto, auth: true }),
+  listLowStock: () => request('/operations/inventory/low-stock', { auth: true }),
+
+  // ---- suppliers + supplier-product links (generic /platform/:resource CRUD) ----
+  listSuppliers: () => request('/platform/suppliers'),
+  createSupplier: (dto) => request('/platform/suppliers', { method: 'POST', body: { reference: `supplier:${Date.now()}`, data: dto }, auth: true }),
+  updateSupplier: (id, dto) => request(`/platform/suppliers/${id}`, { method: 'PATCH', body: { data: dto }, auth: true }),
+  deleteSupplier: (id) => request(`/platform/suppliers/${id}`, { method: 'DELETE', auth: true }),
+  listSupplierProductMappings: () => request('/platform/supplier-product-mappings'),
+  // One mapping per product — reference is the product id, so this looks
+  // for an existing record first and updates it instead of creating a
+  // second mapping for the same product (the DB enforces (resource,
+  // reference) uniqueness, so a blind create would 500 on the second call).
+  async setProductSupplier(productId, supplierId, dto = {}) {
+    const data = { productId, supplierId, ...dto }
+    const existing = await this.listSupplierProductMappings().then((rows) => rows.find((r) => r.reference === productId)).catch(() => null)
+    if (existing) return request(`/platform/supplier-product-mappings/${existing.id}`, { method: 'PATCH', body: { data }, auth: true })
+    return request('/platform/supplier-product-mappings', { method: 'POST', body: { reference: productId, data }, auth: true })
+  },
 
   // ---- platform: generic flexible-resource CRUD (GET/detail public; write staff-only) ----
   platformSummary: () => request('/platform/summary'),

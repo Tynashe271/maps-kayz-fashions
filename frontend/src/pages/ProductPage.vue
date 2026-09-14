@@ -87,7 +87,8 @@ async function saveToWishlist() {
 
   <div v-else-if="product" class="product-detail">
     <div class="product-detail-media">
-      <div class="product-swatch" style="height:100%"><span>{{ product.name }}</span></div>
+      <img v-if="product.imageUrl" :src="product.imageUrl" :alt="product.name" class="product-photo" />
+      <div v-else class="product-swatch" style="height:100%"><span>{{ product.name }}</span></div>
     </div>
     <div class="product-detail-body">
       <p class="eyebrow">{{ product.brand }} &middot; {{ product.category }}</p>

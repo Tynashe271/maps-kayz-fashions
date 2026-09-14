@@ -11,6 +11,7 @@ const routes=[
     {path:'orders',name:'admin-orders',component:()=>import('@store/pages/admin/OrdersPage.vue')},
     {path:'promotions',name:'admin-promotions',component:()=>import('@store/pages/admin/PromotionsPage.vue')},
     {path:'inventory',name:'admin-inventory',component:()=>import('@store/pages/admin/InventoryPage.vue')},
+    {path:'suppliers',name:'admin-suppliers',component:()=>import('@store/pages/admin/SuppliersPage.vue')},
     {path:'deliveries',name:'admin-deliveries',component:()=>import('@store/pages/admin/DeliveriesPage.vue')},
     {path:'returns',name:'admin-returns',component:()=>import('@store/pages/admin/ReturnsPage.vue')},
     {path:'platform',name:'admin-platform',component:()=>import('@store/pages/admin/PlatformPage.vue')}

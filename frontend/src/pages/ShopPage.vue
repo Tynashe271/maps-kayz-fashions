@@ -100,7 +100,8 @@ watch(products, (list) => { visibleProducts.value = list.filter((p) => p.isActiv
     <div class="product-grid">
       <article v-for="product in visibleProducts" :key="product.id" class="product-card">
         <router-link :to="`/product/${product.id}`" class="product-media">
-          <div class="product-swatch"><span>{{ product.name }}</span></div>
+          <img v-if="product.imageUrl" :src="product.imageUrl" :alt="product.name" class="product-photo" loading="lazy" />
+          <div v-else class="product-swatch"><span>{{ product.name }}</span></div>
           <span v-if="product.originalPrice" class="product-tag">SALE</span>
         </router-link>
         <p class="product-category">{{ product.category }}</p>

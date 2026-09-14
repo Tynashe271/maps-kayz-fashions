@@ -11,25 +11,25 @@ import { cartStore, refreshCart } from '../lib/cart'
 
 const route=useRoute(), router=useRouter(), toast=ref(''), search=ref(''), status=ref('All'), selected=ref(null)
 const accountMenuItems = [
-  ['overview', 'Overview'],
-  ['orders', 'My Orders'],
-  ['track', 'Track Order'],
-  ['returns', 'Returns & Exchanges'],
-  ['bag', 'My Cart'],
-  ['wishlist', 'Wishlist'],
-  ['looks', 'Saved Looks'],
-  ['recent', 'Recently Viewed'],
-  ['style', 'My Sizes & Style'],
-  ['loyalty', 'Loyalty & Rewards'],
-  ['coupons', 'Coupons'],
-  ['credit', 'Gift Cards & Credit'],
-  ['addresses', 'Addresses'],
-  ['notifications', 'Notifications'],
-  ['reviews', 'Reviews & Questions'],
-  ['referrals', 'Referrals'],
-  ['support', 'Support Centre'],
-  ['profile', 'Profile'],
-  ['security', 'Privacy & Security'],
+  ['overview', 'Overview', 'Dashboard'],
+  ['bag', 'My Cart', 'Shopping'],
+  ['orders', 'My Orders', 'Orders'],
+  ['track', 'Track Order', 'Orders'],
+  ['returns', 'Returns & Exchanges', 'Orders'],
+  ['wishlist', 'Wishlist', 'Saved'],
+  ['looks', 'Saved Looks', 'Saved'],
+  ['recent', 'Recently Viewed', 'Saved'],
+  ['style', 'My Sizes & Style', 'Saved'],
+  ['loyalty', 'Loyalty & Rewards', 'Benefits'],
+  ['coupons', 'Coupons', 'Benefits'],
+  ['credit', 'Gift Cards & Credit', 'Benefits'],
+  ['referrals', 'Referrals', 'Benefits'],
+  ['profile', 'Profile', 'Account'],
+  ['addresses', 'Addresses', 'Account'],
+  ['notifications', 'Notifications', 'Account'],
+  ['reviews', 'Reviews & Questions', 'Account'],
+  ['support', 'Support Centre', 'Account'],
+  ['security', 'Privacy & Security', 'Account'],
 ]
 const tabs = accountMenuItems.map(([tab]) => tab)
 const activeTab=computed(()=>tabs.includes(route.query.tab)?route.query.tab:'overview')
@@ -88,9 +88,9 @@ async function clearHistory(){await Promise.all(recent.value.filter(x=>x.id).map
 
 <template><div class="customer-dashboard"><div v-if="toast" class="dashboard-toast">{{toast}}</div>
 <header class="dashboard-hero"><div><p class="eyebrow dark">Customer dashboard</p><h1>Welcome back,<br><em>{{name}}.</em></h1><p>Your orders, style, rewards and account — all in one place.</p></div><div class="profile-chip"><img v-if="profilePhoto" :src="profilePhoto" alt="Profile photo"><span v-else>{{initials}}</span><div><strong>{{profile.name||authStore.user?.email}}</strong><small>{{authStore.user?.email}} · Customer account</small></div></div></header>
-<div class="dashboard-layout" :class="{'nav-open':mobileNavOpen}"><button type="button" class="dashboard-menu-button" aria-label="Toggle account menu" @click="mobileNavOpen=!mobileNavOpen"><span>{{tabs.indexOf(activeTab)+1}}</span> My account menu ☰</button><div v-if="mobileNavOpen" class="dashboard-nav-backdrop" @click="mobileNavOpen=false"></div><aside class="dashboard-sidebar"><p>My account</p><button v-for="(x,i) in accountMenuItems" :key="x[0]" :class="{active:activeTab===x[0]}" @click="go(x[0])"><span>{{String(i+1).padStart(2,'0')}}</span>{{x[1]}}<b v-if="x[0]==='bag'">{{cartStore.itemCount}}</b><b v-if="x[0]==='wishlist'">{{wishlist.length}}</b><b v-if="x[0]==='notifications'">{{notices.filter(n=>!n.read).length}}</b></button><router-link to="/shop" class="dashboard-sidebar-shop"><span>🛍</span>Continue shopping</router-link><button @click="logout"><span>20</span>Log Out</button></aside>
+<div class="dashboard-layout" :class="{'nav-open':mobileNavOpen}"><button type="button" class="dashboard-menu-button" aria-label="Toggle account menu" @click="mobileNavOpen=!mobileNavOpen"><span>{{tabs.indexOf(activeTab)+1}}</span> My account menu ☰</button><div v-if="mobileNavOpen" class="dashboard-nav-backdrop" @click="mobileNavOpen=false"></div><aside class="dashboard-sidebar"><p>My account</p><template v-for="(x,i) in accountMenuItems" :key="x[0]"><small v-if="i===0||x[2]!==accountMenuItems[i-1][2]" class="dashboard-sidebar-heading">{{x[2]}}</small><button :class="{active:activeTab===x[0]}" @click="go(x[0])"><span>{{String(i+1).padStart(2,'0')}}</span>{{x[1]}}<b v-if="x[0]==='bag'">{{cartStore.itemCount}}</b><b v-if="x[0]==='wishlist'">{{wishlist.length}}</b><b v-if="x[0]==='notifications'">{{notices.filter(n=>!n.read).length}}</b></button></template><router-link to="/shop" class="dashboard-sidebar-shop"><span>🛍</span>Continue shopping</router-link><button @click="logout"><span>20</span>Log Out</button></aside>
 <main class="dashboard-content">
-<template v-if="activeTab==='overview'"><section class="dashboard-summary four"><article><span>Active orders</span><strong>{{orders.length}}</strong><button @click="go('orders')">View orders →</button></article><article><span>Cart items</span><strong>{{cartStore.itemCount}}</strong><button @click="go('bag')">View cart →</button></article><article><span>Wishlist</span><strong>{{wishlist.length}}</strong><button @click="go('wishlist')">View wishlist →</button></article><article><span>Notifications</span><strong>{{notices.filter(n=>!n.read).length}}</strong><button @click="go('notifications')">View notifications →</button></article></section>
+<template v-if="activeTab==='overview'"><nav class="dashboard-overview-taskbar" aria-label="Dashboard shortcuts"><router-link to="/account" class="active"><i></i>Home</router-link><router-link to="/shop"><i></i>Shop</router-link><button type="button" @click="go('orders')"><i></i>Orders</button><button type="button" @click="go('bag')"><i></i>Cart</button></nav><section class="dashboard-summary four"><article><span>Active orders</span><strong>{{orders.length}}</strong><button @click="go('orders')">View orders →</button></article><article><span>Cart items</span><strong>{{cartStore.itemCount}}</strong><button @click="go('bag')">View cart →</button></article><article><span>Wishlist</span><strong>{{wishlist.length}}</strong><button @click="go('wishlist')">View wishlist →</button></article><article><span>Notifications</span><strong>{{notices.filter(n=>!n.read).length}}</strong><button @click="go('notifications')">View notifications →</button></article></section>
 <section class="dashboard-grid-main"><article class="dashboard-card"><div class="card-heading"><div><p class="eyebrow dark">Orders</p><h2>No active delivery</h2></div></div><p class="safe-note">New order and delivery updates will appear here.</p><button class="text-action" @click="go('track')">Track an order →</button></article><article class="dashboard-card"><p class="eyebrow dark">Quick actions</p><div class="quick-actions"><router-link to="/shop">Continue shopping</router-link><button @click="go('bag')">View cart</button><button @click="go('track')">Track order</button><button @click="go('support')">Contact support</button></div></article></section>
 <section class="dashboard-two-col"><article class="dashboard-card"><div class="card-heading"><div><p class="eyebrow dark">Picked for you</p><h2>Recommendations</h2></div></div><div class="product-mini-grid"><div v-for="p in recent.slice(0,2)" :key="p.name"><div class="product-placeholder">MK</div><strong>{{p.name}}</strong><small>US${{p.price}}</small><button @click="flash('We’ll show fewer items like this')">Not interested</button></div></div></article><article class="dashboard-card"><div class="card-heading"><div><p class="eyebrow dark">The latest</p><h2>Notifications</h2></div><button class="text-action" @click="go('notifications')">View all →</button></div><div v-for="n in notices.slice(0,3)" :key="n.id" class="notice-row"><i :class="{unread:!n.read}"></i><div><strong>{{n.title}}</strong><small>{{n.time}}</small></div></div></article></section></template>
 

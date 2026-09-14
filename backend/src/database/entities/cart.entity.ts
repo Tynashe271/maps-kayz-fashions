@@ -9,6 +9,7 @@ export interface CartLine {
   unitPrice: number;
   size?: string;
   colour?: string;
+  imageUrl?: string | null;
 }
 
 @Entity('shopping_carts')

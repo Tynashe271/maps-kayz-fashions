@@ -43,4 +43,10 @@ export class AdminController {
   verifyPayment(@Param('orderNumber') orderNumber: string, @Body() dto: VerifyPaymentDto) {
     return this.ordersService.verifyPayment(orderNumber, dto.reference);
   }
+
+  @Post('orders/:orderNumber/send-receipt')
+  @ApiOperation({ summary: 'Resend the WhatsApp receipt for an order' })
+  sendReceipt(@Param('orderNumber') orderNumber: string) {
+    return this.ordersService.sendReceipt(orderNumber);
+  }
 }

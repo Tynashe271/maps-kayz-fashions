@@ -5,7 +5,7 @@ import { api } from '@store/lib/api'
 import { setSession } from '@store/lib/auth'
 
 const router = useRouter()
-const storefrontUrl = import.meta.env.VITE_STOREFRONT_URL ?? 'http://localhost:9990'
+const storefrontUrl = import.meta.env.VITE_STOREFRONT_URL ?? (import.meta.env.PROD ? 'https://shop.tinashenyenyesa.co.zw' : 'http://localhost:9990')
 const email = ref('')
 const password = ref('')
 const busy = ref(false)

@@ -8,7 +8,7 @@ const route = useRoute()
 const showBackButton = computed(() => route.name !== 'admin-dashboard')
 // Falls back to localhost for local dev; set at build time for deployed
 // environments (see frontend-admin/.env.production.example).
-const storefrontUrl = import.meta.env.VITE_STOREFRONT_URL ?? 'http://localhost:9990'
+const storefrontUrl = import.meta.env.VITE_STOREFRONT_URL ?? (import.meta.env.PROD ? 'https://shop.tinashenyenyesa.co.zw' : 'http://localhost:9990')
 
 const mobileNavOpen = ref(false)
 // A tap on any nav link (or the back button) navigates, which should also
@@ -24,6 +24,7 @@ const links = [
   { to: '/orders', label: 'Orders' },
   { to: '/promotions', label: 'Promotions' },
   { to: '/inventory', label: 'Inventory' },
+  { to: '/suppliers', label: 'Suppliers' },
   { to: '/deliveries', label: 'Deliveries' },
   { to: '/returns', label: 'Returns' },
   { to: '/platform', label: 'Customer activity' },

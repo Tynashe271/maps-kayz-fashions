@@ -41,7 +41,7 @@ export class CartsService {
     if (existing) existing.quantity += dto.quantity;
     else cart.items = [...cart.items, {
       id: randomUUID(), productId: product.id, name: product.name, sku: product.sku,
-      quantity: dto.quantity, unitPrice: Number(product.price), size: dto.size, colour: dto.colour,
+      quantity: dto.quantity, unitPrice: Number(product.price), size: dto.size, colour: dto.colour, imageUrl: product.imageUrl,
     }];
     return this.withTotals(await this.carts.save(cart));
   }

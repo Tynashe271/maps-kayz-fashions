@@ -118,6 +118,18 @@ function logout() {
 }
 
 function goBack() {
+  // Account tabs are swapped with router.replace(), so they deliberately do
+  // not add history entries. Their Back action must return to the overview.
+  if (route.name === 'account' && route.query.tab) {
+    router.replace({ name: 'account' })
+    return
+  }
+  // Cart is commonly opened directly from the app shell and may not have a
+  // previous in-frame route. Give it a deterministic destination.
+  if (route.name === 'cart') {
+    router.replace({ name: 'account' })
+    return
+  }
   if (window.history.length > 1) router.back()
   else router.push('/')
 }
@@ -140,7 +152,7 @@ function handleBrandClick(event) {
       <nav :class="{ open: menuOpen }" aria-label="Main navigation">
         <router-link to="/shop" @click="menuOpen = false">Shop</router-link>
         <router-link to="/categories" @click="menuOpen = false">Categories</router-link>
-        <router-link to="/#story" @click="menuOpen = false">About</router-link>
+        <router-link :to="authStore.user ? '/#story' : { path: '/login', query: { redirect: '/#story' } }" @click="menuOpen = false">About</router-link>
       </nav>
       <div class="header-actions">
         <router-link to="/cart" aria-label="Shopping cart">Cart <b>{{ cartStore.itemCount }}</b></router-link>
