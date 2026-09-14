@@ -120,11 +120,6 @@ export class OrdersService {
           inventoryByProduct.set(productId, await manager.save(seededStock));
         }
       }
-      for (const [productId, quantity] of quantities) {
-        const stock = inventoryByProduct.get(productId);
-        if (!stock || stock.available < quantity) throw new ConflictException(`Insufficient stock for product ${productId}`);
-      }
-
       const byId = new Map(products.map((product) => [product.id, product]));
       for (const item of dto.items) {
         const product = byId.get(item.productId)!;
@@ -149,7 +144,7 @@ export class OrdersService {
         stock.reserved += quantity;
         await manager.save(stock);
         const product = byId.get(productId)!;
-        product.stock = Math.max(0, product.stock - quantity);
+        product.stock -= quantity;
         await manager.save(product);
         await manager.save(manager.create(StockMovement, { productId, branchId, quantity, type: StockMovementType.Reservation, reason: 'Order checkout' }));
       }
