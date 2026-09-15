@@ -166,12 +166,20 @@ To change the API URL, add a custom domain, or edit any of the above later:
 this project's **Settings** tab. Every push to `master` auto-deploys, same
 as Render — no GitHub Actions involved here either.
 
-The admin site opens directly to its staff login at `/login`. The app uses
-backend-issued tokens and restricts dashboard routes to staff accounts.
-The old HTTP Basic Auth Pages middleware was removed because its browser
-prompt blocked access to this login page. The old `BASIC_AUTH_USER` and
-`BASIC_AUTH_PASS` Pages variables can be removed from Settings > Variables
-and secrets after the updated deployment is live.
+**Extra access layer: HTTP Basic Auth (done)** — `frontend-admin/functions/_middleware.js`
+gates every request (pages and static assets alike) behind Basic Auth
+before the app's own JWT staff login ever runs. [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
+would have been the more standard choice here, but it requires a payment
+method on file even on its free plan — same wall this project hit with
+DigitalOcean and Google Cloud earlier — so this Pages Function is the
+no-card alternative. It fails open (serves normally) if the two env vars
+below aren't set, so a preview deploy without them configured doesn't lock
+everyone out silently.
+
+Credentials live in this project's **Settings > Variables and secrets**:
+- `BASIC_AUTH_USER` (Text) — currently `admin`
+- `BASIC_AUTH_PASS` (Secret, not re-viewable once saved — rotate it there
+  if it's ever lost, don't try to recover the old value)
 
 **Custom domain (done, pending DNS)**: `admin.tinashenyenyesa.co.zw` is
 added under this project's **Custom domains** tab (status: Initializing,
@@ -183,9 +191,15 @@ AI agent: a **CNAME record**, name `admin`, target
 custom domain activates on its own once the record resolves; no redeploy
 needed for this part (unlike the env var changes above).
 
-Changes to build-time environment variables take effect on the next deploy.
-After saving, use **Manage deployment > Retry deployment** on the latest one
-rather than waiting for the next push.
+Changing either takes effect on the next deploy — after saving, use
+**Manage deployment > Retry deployment** on the latest one rather than
+waiting for the next push.
+
+If a card ever gets added and Cloudflare Access becomes worth switching
+to instead: Cloudflare dashboard > Zero Trust > Access > Applications >
+Add an application > Self-hosted > domain `maps-kayz-admin.pages.dev` > a
+policy allowing only the staff emails that should reach it — then this
+Pages Function can be deleted.
 
 **Gotcha if this project is ever recreated from scratch**: `frontend-admin`
 shares code with `frontend` via a `@store` Vite alias into `../frontend/src`
