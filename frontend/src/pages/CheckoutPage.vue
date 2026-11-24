@@ -149,8 +149,8 @@ async function copyMessage() {
             <input id="city" v-model="form.city" type="text" placeholder="Bulawayo" required />
           </div>
           <div class="field">
-            <label for="suburb">Suburb</label>
-            <input id="suburb" v-model="form.suburb" type="text" placeholder="Cowdray Park" required />
+            <label for="suburb">Suburb (optional)</label>
+            <input id="suburb" v-model="form.suburb" type="text" placeholder="Cowdray Park" />
           </div>
           <div class="field span-2">
             <label for="landmark">Nearby landmark</label>
