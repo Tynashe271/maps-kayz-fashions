@@ -6,7 +6,7 @@ import { PLATFORM_RESOURCES } from '../database/entities/platform-record.entity'
  * are available through the flexible /platform/:resource CRUD API.
  */
 export const PLATFORM_CAPABILITIES = {
-  service: 'Maps Kayz Fashions API',
+  service: 'DripHub Fashions API',
   version: '1.0.0',
   documentation: '/docs',
   scope: {

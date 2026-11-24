@@ -18,7 +18,7 @@ export function CustomerSidebar({ open, onClose, onNavigate }) {
     <View style={styles.layer}>
       <Pressable accessibilityLabel="Close menu" style={styles.backdrop} onPress={onClose} />
       <View style={styles.drawer}>
-        <View style={styles.heading}><View><Text style={styles.eyebrow}>MAPS KAYZ</Text><Text style={styles.title}>Customer menu</Text></View><Pressable accessibilityLabel="Close menu" style={styles.close} onPress={onClose}><Text style={styles.closeText}>×</Text></Pressable></View>
+        <View style={styles.heading}><View><Text style={styles.eyebrow}>DRIPHUB</Text><Text style={styles.title}>Customer menu</Text></View><Pressable accessibilityLabel="Close menu" style={styles.close} onPress={onClose}><Text style={styles.closeText}>×</Text></Pressable></View>
         <ScrollView contentContainerStyle={styles.menu}>
           {customerMenuGroups.map((group) => <View key={group.title} style={styles.group}><Text style={styles.groupTitle}>{group.title}</Text>{group.items.map(([path, label]) => { const index = customerMenu.findIndex(([itemPath]) => itemPath === path); return <Pressable key={path} style={styles.item} onPress={() => { onNavigate(path); onClose() }}><Text style={styles.number}>{String(index + 1).padStart(2, '0')}</Text><Text style={styles.label}>{label}</Text><Text style={styles.arrow}>→</Text></Pressable> })}</View>)}
           <Pressable style={styles.shopButton} onPress={() => { onNavigate('/shop'); onClose() }}><Text style={styles.shopText}>CONTINUE SHOPPING →</Text></Pressable>

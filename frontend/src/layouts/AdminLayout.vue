@@ -45,7 +45,7 @@ function goBack() {
   <div class="admin-shell" :class="{ 'nav-open': mobileNavOpen }">
     <div v-if="mobileNavOpen" class="admin-nav-backdrop" @click="mobileNavOpen = false"></div>
     <aside class="admin-sidebar">
-      <router-link class="admin-brand" to="/"><img src="/admin-logo-mark.svg" alt="Maps Kayz Admin" width="42" height="42" /><span>MAPS KAYZ<small>ADMINISTRATION</small></span></router-link>
+      <router-link class="admin-brand" to="/"><img src="/admin-logo-mark.svg" alt="DripHub Admin" width="42" height="42" /><span>DRIPHUB<small>ADMINISTRATION</small></span></router-link>
       <nav>
         <router-link v-for="link in links" :key="link.to" :to="link.to" :class="{ active: link.exact ? $route.path === link.to : $route.path.startsWith(link.to) }">{{ link.label }}</router-link>
       </nav>

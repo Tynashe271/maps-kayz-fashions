@@ -1,4 +1,4 @@
-// Real contact details for Maps Kayz Fashions — single source of truth so every
+// Real contact details for DripHub Fashions — single source of truth so every
 // page (footer, floating WhatsApp button, etc.) links to the same handles.
 export const CONTACT = {
   ownerName: 'Keen K Mapfumo',

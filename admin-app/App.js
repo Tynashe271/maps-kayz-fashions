@@ -152,11 +152,11 @@ export default function App() {
 }
 
 function LoadingState() {
-  return <View style={styles.state}><View style={styles.logo}><Text style={styles.logoText}>MK</Text></View><ActivityIndicator color="#f2a8c4" size="large" /><Text style={styles.stateText}>Opening admin workspace…</Text></View>
+  return <View style={styles.state}><View style={styles.logo}><Text style={styles.logoText}>DH</Text></View><ActivityIndicator color="#f2a8c4" size="large" /><Text style={styles.stateText}>Opening admin workspace…</Text></View>
 }
 
 function ErrorState({ onRetry }) {
-  return <View style={styles.state}><View style={styles.logo}><Text style={styles.logoText}>MK</Text></View><Text style={styles.eyebrow}>MAPS KAYZ ADMIN</Text><Text style={styles.errorTitle}>Workspace unavailable.</Text><Text style={styles.stateText}>Check your internet connection and try again.</Text><Pressable style={styles.retryButton} onPress={onRetry}><Text style={styles.retryText}>TRY AGAIN</Text></Pressable></View>
+  return <View style={styles.state}><View style={styles.logo}><Text style={styles.logoText}>DH</Text></View><Text style={styles.eyebrow}>DRIPHUB ADMIN</Text><Text style={styles.errorTitle}>Workspace unavailable.</Text><Text style={styles.stateText}>Check your internet connection and try again.</Text><Pressable style={styles.retryButton} onPress={onRetry}><Text style={styles.retryText}>TRY AGAIN</Text></Pressable></View>
 }
 
 const styles = StyleSheet.create({

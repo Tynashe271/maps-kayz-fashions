@@ -14,7 +14,7 @@ export class CreateProductDto {
   @IsString()
   category: string;
 
-  @ApiProperty({ example: 'Maps Kayz' })
+  @ApiProperty({ example: 'DripHub' })
   @IsString()
   brand: string;
 

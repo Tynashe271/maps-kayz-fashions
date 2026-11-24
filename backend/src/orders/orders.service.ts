@@ -185,7 +185,7 @@ export class OrdersService {
     const lines = order.items.map((item, index) => `${index + 1} × ${nameById.get(item.productId) || item.productId}\n${item.size ? `Size: ${item.size}\n` : ''}${item.colour ? `Colour: ${item.colour}\n` : ''}Price: US$${Number(item.total).toFixed(2)}`);
     const location = [order.deliveryAddress?.suburb, order.deliveryAddress?.city].filter(Boolean).join(', ');
     const paymentLink = this.buildPaymentLink(order.orderNumber);
-    const message = [`Hello Maps Kayz Fashions.`, ``, `I have placed an order on your website.`, ``, `Order number: ${order.orderNumber}`, ``, `Items:`, ...lines, ``, `Delivery: US$${Number(order.deliveryFee).toFixed(2)}`, `Total: US$${Number(order.total).toFixed(2)}`, location ? `\nDelivery location:\n${location}` : '', ``, `Payment method: ${order.paymentMethod}`, `Payment link: ${paymentLink}`, ``, `Please confirm my order.`].filter(Boolean).join('\n');
+    const message = [`Hello DripHub Fashions.`, ``, `I have placed an order on your website.`, ``, `Order number: ${order.orderNumber}`, ``, `Items:`, ...lines, ``, `Delivery: US$${Number(order.deliveryFee).toFixed(2)}`, `Total: US$${Number(order.total).toFixed(2)}`, location ? `\nDelivery location:\n${location}` : '', ``, `Payment method: ${order.paymentMethod}`, `Payment link: ${paymentLink}`, ``, `Please confirm my order.`].filter(Boolean).join('\n');
     const businessNumber = (process.env.WHATSAPP_ORDER_NUMBER || '263781657310').replace(/\D/g, '');
     return { message, url: `https://wa.me/${businessNumber}?text=${encodeURIComponent(message)}`, paymentLink };
   }

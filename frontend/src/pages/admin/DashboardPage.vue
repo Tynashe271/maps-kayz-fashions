@@ -14,7 +14,7 @@ onMounted(async()=>{
 })
 </script>
 <template>
-  <div class="admin-landing-head"><div><p class="eyebrow dark">Operations overview</p><h1>{{greeting}}, Maps Kayz.</h1><p>Live sales, stock balances and inventory forecasts from the database. <span class="status-pill" :class="whatsappConfigured?'tone-success':'tone-muted'" style="margin-left:6px">WhatsApp Cloud API {{whatsappConfigured?'connected':'not configured'}}</span></p></div><router-link class="btn btn-primary" to="/products">+ Add product</router-link></div>
+  <div class="admin-landing-head"><div><p class="eyebrow dark">Operations overview</p><h1>{{greeting}}, DripHub.</h1><p>Live sales, stock balances and inventory forecasts from the database. <span class="status-pill" :class="whatsappConfigured?'tone-success':'tone-muted'" style="margin-left:6px">WhatsApp Cloud API {{whatsappConfigured?'connected':'not configured'}}</span></p></div><router-link class="btn btn-primary" to="/products">+ Add product</router-link></div>
   <p v-if="error" class="alert alert-error">{{error}}</p><div v-if="loading" class="loading-state">Loading live store data…</div>
   <template v-else-if="stats">
     <section class="admin-hero-metric"><div><span>Today's sales</span><strong>US${{money(stats.todaysSales)}}</strong><small>Recorded from valid orders today</small></div><div class="admin-health"><p><span>Products</span><b>{{stats.totalProducts}}</b></p><p><span>Deliveries</span><b>{{stats.deliveries}}</b></p><p><span>Returns</span><b>{{stats.returns}}</b></p></div></section>

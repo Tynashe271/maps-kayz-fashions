@@ -36,9 +36,9 @@ async function login() {
     <div class="admin-welcome-glow two"></div>
 
     <header class="admin-welcome-nav">
-      <a class="admin-welcome-brand" href="/login" aria-label="Maps Kayz admin home">
+      <a class="admin-welcome-brand" href="/login" aria-label="DripHub admin home">
         <img src="/admin-logo-mark.svg" alt="" width="50" height="50">
-        <div><strong>Maps Kayz</strong><small>Operations Portal</small></div>
+        <div><strong>DripHub</strong><small>Operations Portal</small></div>
       </a>
       <div class="admin-welcome-nav-right">
         <span><i></i> Systems online</span>
@@ -49,7 +49,7 @@ async function login() {
     <section class="admin-welcome-main">
       <div class="admin-welcome-copy">
         <p class="admin-welcome-eyebrow"><span>01</span> Store command centre</p>
-        <h1>Everything behind the<br><em>Maps Kayz</em> experience.</h1>
+        <h1>Everything behind the<br><em>DripHub</em> experience.</h1>
         <p class="admin-welcome-intro">Manage products, fulfil orders and look after customers from one connected workspace.</p>
 
         <div class="admin-welcome-capabilities" aria-label="Admin capabilities">
@@ -90,7 +90,7 @@ async function login() {
     </section>
 
     <footer class="admin-welcome-footer">
-      <span>Maps Kayz Fashions</span>
+      <span>DripHub Fashions</span>
       <span>Bulawayo · Zimbabwe</span>
       <span>Administration / 2026</span>
     </footer>

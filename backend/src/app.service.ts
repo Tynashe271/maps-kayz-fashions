@@ -3,6 +3,6 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AppService {
   getHello(): string {
-    return 'Maps Kayz Fashions API is running.';
+    return 'DripHub Fashions API is running.';
   }
 }

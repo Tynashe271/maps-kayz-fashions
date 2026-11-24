@@ -1,4 +1,4 @@
-// Thin fetch wrapper around the Maps Kayz Fashions backend (NestJS, global
+// Thin fetch wrapper around the DripHub Fashions backend (NestJS, global
 // prefix "/api"). Every function here maps 1:1 to a real backend endpoint —
 // see backend/src/*/*.controller.ts for the source of truth.
 

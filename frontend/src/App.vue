@@ -10,18 +10,18 @@ const embedded = window.parent !== window
 // login (or are pure utility, like the 404) are marked noindex since a
 // crawler only ever sees them logged out or empty.
 const PAGE_TITLES = {
-  home: 'Maps Kayz — Wear Your Story',
-  shop: 'Shop | Maps Kayz',
-  product: 'Product | Maps Kayz',
-  categories: 'Categories | Maps Kayz',
-  cart: 'Your Cart | Maps Kayz',
-  checkout: 'Checkout | Maps Kayz',
-  returns: 'Returns & Exchanges | Maps Kayz',
-  'track-order': 'Track Your Order | Maps Kayz',
-  login: 'Log In | Maps Kayz',
-  register: 'Create an Account | Maps Kayz',
-  account: 'My Account | Maps Kayz',
-  'not-found': 'Page Not Found | Maps Kayz',
+  home: 'DripHub — Wear Your Story',
+  shop: 'Shop | DripHub',
+  product: 'Product | DripHub',
+  categories: 'Categories | DripHub',
+  cart: 'Your Cart | DripHub',
+  checkout: 'Checkout | DripHub',
+  returns: 'Returns & Exchanges | DripHub',
+  'track-order': 'Track Your Order | DripHub',
+  login: 'Log In | DripHub',
+  register: 'Create an Account | DripHub',
+  account: 'My Account | DripHub',
+  'not-found': 'Page Not Found | DripHub',
 }
 const NOINDEX_ROUTES = new Set(['login', 'register', 'account', 'cart', 'checkout', 'pay', 'not-found'])
 
@@ -52,7 +52,7 @@ watch(
   () => route.fullPath,
   (path) => {
     document.documentElement.classList.toggle('mobile-app-landing', embedded && route.name === 'home')
-    document.title = PAGE_TITLES[route.name] ?? 'Maps Kayz — Wear Your Story'
+    document.title = PAGE_TITLES[route.name] ?? 'DripHub — Wear Your Story'
     setRobotsMeta(NOINDEX_ROUTES.has(route.name))
     if (embedded) {
       window.parent.postMessage({ type: 'maps-kayz-route', path }, '*')

@@ -1,6 +1,6 @@
-# Maps Kayz Admin App
+# DripHub Admin App
 
-Expo shell for the responsive Maps Kayz admin web portal. The app retains the portal's authentication, role checks, live updates, and all admin workflows while adding native Android back navigation, pull-to-refresh, route restoration, external-link handling, and offline/error states.
+Expo shell for the responsive DripHub admin web portal. The app retains the portal's authentication, role checks, live updates, and all admin workflows while adding native Android back navigation, pull-to-refresh, route restoration, external-link handling, and offline/error states.
 
 The app uses its own `index.js` entry point so it remains isolated from the customer app even when both projects share a local Expo dependency cache.
 

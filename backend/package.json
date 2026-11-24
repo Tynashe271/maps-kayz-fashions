@@ -1,7 +1,7 @@
 {
   "name": "maps-kayz-backend",
   "version": "1.0.0",
-  "description": "Maps Kayz Fashions backend API",
+  "description": "DripHub Fashions backend API",
   "private": true,
   "scripts": {
     "build": "nest build",

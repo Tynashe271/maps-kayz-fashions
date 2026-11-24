@@ -136,7 +136,7 @@ export default function App() {
     <SafeAreaView style={styles.safeArea}>
       <ExpoStatusBar style="light" backgroundColor="#070707" />
       <View style={styles.app}>
-        {showTabBar && <View style={styles.appBar}><Pressable accessibilityLabel="Go back" accessibilityState={{ disabled: !canNavigateBack }} disabled={!canNavigateBack} style={[styles.backButton, !canNavigateBack && styles.backButtonDisabled]} onPress={goBack}><Text style={styles.backText}>‹</Text></Pressable><Pressable accessibilityLabel="Open customer menu" style={styles.brandButton} onPress={() => setMenuOpen(true)}><View style={styles.brandMark}><Text style={styles.brandMarkText}>MK</Text></View><Text style={styles.appBarTitle}>MAPS KAYZ</Text></Pressable><Pressable style={styles.cartButton} onPress={() => navigate('/account?tab=bag')}><Text style={styles.cartText}>CART</Text></Pressable></View>}
+        {showTabBar && <View style={styles.appBar}><Pressable accessibilityLabel="Go back" accessibilityState={{ disabled: !canNavigateBack }} disabled={!canNavigateBack} style={[styles.backButton, !canNavigateBack && styles.backButtonDisabled]} onPress={goBack}><Text style={styles.backText}>‹</Text></Pressable><Pressable accessibilityLabel="Open customer menu" style={styles.brandButton} onPress={() => setMenuOpen(true)}><View style={styles.brandMark}><Text style={styles.brandMarkText}>DH</Text></View><Text style={styles.appBarTitle}>DRIPHUB</Text></Pressable><Pressable style={styles.cartButton} onPress={() => navigate('/account?tab=bag')}><Text style={styles.cartText}>CART</Text></Pressable></View>}
         {!routeReady ? <LoadingState /> : failed ? <ErrorState onRetry={reload} /> : (
           <WebView
             key={reloadKey}
@@ -169,11 +169,11 @@ export default function App() {
 }
 
 function LoadingState() {
-  return <View style={styles.loadingState}><View style={styles.logo}><Text style={styles.logoText}>MK</Text></View><ActivityIndicator color="#f2a8c4" size="large" /><Text style={styles.loadingText}>Opening Maps Kayz…</Text></View>
+  return <View style={styles.loadingState}><View style={styles.logo}><Text style={styles.logoText}>DH</Text></View><ActivityIndicator color="#f2a8c4" size="large" /><Text style={styles.loadingText}>Opening DripHub…</Text></View>
 }
 
 function ErrorState({ onRetry }) {
-  return <View style={styles.errorState}><View style={styles.logo}><Text style={styles.logoText}>MK</Text></View><Text style={styles.eyebrow}>MAPS KAYZ FASHIONS</Text><Text style={styles.errorTitle}>We couldn’t load the store.</Text><Text style={styles.errorCopy}>Check your internet connection and try again.</Text><Pressable style={styles.retryButton} onPress={onRetry}><Text style={styles.retryText}>TRY AGAIN</Text></Pressable></View>
+  return <View style={styles.errorState}><View style={styles.logo}><Text style={styles.logoText}>DH</Text></View><Text style={styles.eyebrow}>DRIPHUB FASHIONS</Text><Text style={styles.errorTitle}>We couldn’t load the store.</Text><Text style={styles.errorCopy}>Check your internet connection and try again.</Text><Pressable style={styles.retryButton} onPress={onRetry}><Text style={styles.retryText}>TRY AGAIN</Text></Pressable></View>
 }
 
 const styles = StyleSheet.create({

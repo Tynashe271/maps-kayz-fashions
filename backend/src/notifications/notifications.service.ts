@@ -46,7 +46,7 @@ export class NotificationsService {
       active: true,
     }));
     const message = [
-      '⚠️ Low stock alert — Maps Kayz Fashions',
+      '⚠️ Low stock alert — DripHub Fashions',
       '',
       `${input.productName} (${input.sku})`,
       `Branch: ${input.branchId}`,
@@ -62,7 +62,7 @@ export class NotificationsService {
   private buildReceiptMessage(order: Order, lines: ReceiptLine[]) {
     const itemLines = lines.map((line, index) => `${index + 1}. ${line.name} x${line.quantity} — US$${line.total.toFixed(2)}`);
     return [
-      'Receipt — Maps Kayz Fashions',
+      'Receipt — DripHub Fashions',
       '',
       `Order: ${order.orderNumber}`,
       `Date: ${new Date(order.createdAt).toLocaleDateString()}`,

@@ -1,4 +1,4 @@
-# Maps Kayz Customer App
+# DripHub Customer App
 
 React Native customer app built with Expo. It runs the production customer storefront inside a native application shell and does not use Flutter.
 

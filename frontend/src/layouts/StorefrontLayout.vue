@@ -148,7 +148,7 @@ function handleBrandClick(event) {
     <div class="announcement"><span>Complimentary Bulawayo delivery on orders over US$80</span><b>&bull;</b><span>Nationwide delivery available</span></div>
 
     <header class="site-header">
-      <router-link class="brand" to="/" aria-label="Maps Kayz Fashions home; opens the account menu on the mobile dashboard" @click="handleBrandClick"><img class="monogram" src="/logo-mark.svg" alt="" width="64" height="64" /><span class="brand-name">MAPS KAYZ<small>FASHIONS &middot; BYO</small></span></router-link>
+      <router-link class="brand" to="/" aria-label="DripHub Fashions home; opens the account menu on the mobile dashboard" @click="handleBrandClick"><img class="monogram" src="/logo-mark.svg" alt="" width="64" height="64" /><span class="brand-name">DRIPHUB<small>FASHIONS &middot; BYO</small></span></router-link>
       <nav :class="{ open: menuOpen }" aria-label="Main navigation">
         <router-link to="/shop" @click="menuOpen = false">Shop</router-link>
         <router-link to="/categories" @click="menuOpen = false">Categories</router-link>
@@ -172,7 +172,7 @@ function handleBrandClick(event) {
 
     <footer>
       <div class="footer-brand">
-        <router-link class="brand" to="/"><img class="monogram" src="/logo-mark.svg" alt="" width="64" height="64" /><span class="brand-name">MAPS KAYZ<small>FASHIONS &middot; BYO</small></span></router-link>
+        <router-link class="brand" to="/"><img class="monogram" src="/logo-mark.svg" alt="" width="64" height="64" /><span class="brand-name">DRIPHUB<small>FASHIONS &middot; BYO</small></span></router-link>
         <p>Style for every occasion.<br />Bulawayo, Zimbabwe.</p>
       </div>
       <div><h3>SHOP</h3><router-link to="/shop">All products</router-link><router-link to="/shop?category=women-formal">Women</router-link><router-link to="/shop?category=men-formal">Men</router-link><router-link to="/categories">Categories</router-link></div>
@@ -192,6 +192,6 @@ function handleBrandClick(event) {
         <a :href="CONTACT.facebookUrl" target="_blank" rel="noopener">Facebook &middot; {{ CONTACT.facebookLabel }}</a>
       </div>
     </footer>
-    <a class="whatsapp" :href="CONTACT.whatsappUrl" aria-label="Chat with Maps Kayz Fashions on WhatsApp" target="_blank" rel="noopener">WA</a>
+    <a class="whatsapp" :href="CONTACT.whatsappUrl" aria-label="Chat with DripHub Fashions on WhatsApp" target="_blank" rel="noopener">WA</a>
   </div>
 </template>

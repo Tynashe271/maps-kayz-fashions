@@ -45,10 +45,10 @@ export default function App() {
   return (
     <View style={styles.app}>
       <StatusBar style="light" backgroundColor="#070707" />
-      {showTabBar && <View style={styles.appBar}><Pressable accessibilityLabel="Go back" disabled={!canNavigateBack} style={[styles.backButton, !canNavigateBack && styles.backButtonDisabled]} onPress={goBack}><Text style={styles.backText}>‹</Text></Pressable><Pressable accessibilityLabel="Open customer menu" style={styles.brandButton} onPress={() => setMenuOpen(true)}><View style={styles.brandMark}><Text style={styles.brandMarkText}>MK</Text></View><Text style={styles.appBarTitle}>MAPS KAYZ</Text></Pressable><Pressable style={styles.cartButton} onPress={() => navigate('/account?tab=bag')}><Text style={styles.cartText}>CART</Text></Pressable></View>}
+      {showTabBar && <View style={styles.appBar}><Pressable accessibilityLabel="Go back" disabled={!canNavigateBack} style={[styles.backButton, !canNavigateBack && styles.backButtonDisabled]} onPress={goBack}><Text style={styles.backText}>‹</Text></Pressable><Pressable accessibilityLabel="Open customer menu" style={styles.brandButton} onPress={() => setMenuOpen(true)}><View style={styles.brandMark}><Text style={styles.brandMarkText}>DH</Text></View><Text style={styles.appBarTitle}>DRIPHUB</Text></Pressable><Pressable style={styles.cartButton} onPress={() => navigate('/account?tab=bag')}><Text style={styles.cartText}>CART</Text></Pressable></View>}
       {React.createElement('iframe', {
         src: new URL(path, STOREFRONT_URL).toString(),
-        title: 'Maps Kayz customer storefront',
+        title: 'DripHub customer storefront',
         onLoad: () => setLoading(false),
         allow: 'clipboard-read; clipboard-write; payment; camera',
         style: {
@@ -59,7 +59,7 @@ export default function App() {
           background: '#070707',
         },
       })}
-      {loading && <View style={styles.loadingState}><View style={styles.loadingLogo}><Text style={styles.loadingLogoText}>MK</Text></View><ActivityIndicator color="#f2a8c4" size="large" /><Text style={styles.loadingText}>Opening Maps Kayz…</Text></View>}
+      {loading && <View style={styles.loadingState}><View style={styles.loadingLogo}><Text style={styles.loadingLogoText}>DH</Text></View><ActivityIndicator color="#f2a8c4" size="large" /><Text style={styles.loadingText}>Opening DripHub…</Text></View>}
       {showTabBar && <CustomerSidebar open={menuOpen} onClose={() => setMenuOpen(false)} onNavigate={navigate} />}
     </View>
   )

@@ -12,13 +12,13 @@ export default function App() {
   return (
     <View style={styles.app}>
       <StatusBar style="light" backgroundColor="#070707" />
-      {failed ? <ErrorState onRetry={reload} /> : <><iframe key={reloadKey} title="Maps Kayz Admin" src={ADMIN_URL} onLoad={() => setLoading(false)} onError={() => setFailed(true)} style={styles.frame} />{loading && <LoadingState />}</>}
+      {failed ? <ErrorState onRetry={reload} /> : <><iframe key={reloadKey} title="DripHub Admin" src={ADMIN_URL} onLoad={() => setLoading(false)} onError={() => setFailed(true)} style={styles.frame} />{loading && <LoadingState />}</>}
     </View>
   )
 }
 
 function LoadingState() {
-  return <View style={styles.state}><View style={styles.logo}><Text style={styles.logoText}>MK</Text></View><ActivityIndicator color="#f2a8c4" size="large" /><Text style={styles.stateText}>Opening admin workspace…</Text></View>
+  return <View style={styles.state}><View style={styles.logo}><Text style={styles.logoText}>DH</Text></View><ActivityIndicator color="#f2a8c4" size="large" /><Text style={styles.stateText}>Opening admin workspace…</Text></View>
 }
 
 function ErrorState({ onRetry }) {

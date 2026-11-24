@@ -39,10 +39,10 @@ async function submit() {
 <template>
   <section class="auth-shell">
     <div class="auth-visual">
-      <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1200&q=88" alt="Maps Kayz tailored collection" />
+      <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1200&q=88" alt="DripHub tailored collection" />
       <div class="auth-visual-shade"></div>
-      <div class="auth-visual-copy"><p class="eyebrow">Maps Kayz members</p><h1>Your style,<br><em>all in one place.</em></h1><p>Save your cart, move through checkout faster, and keep every order within reach.</p></div>
-      <span class="auth-visual-index">MK / 01</span>
+      <div class="auth-visual-copy"><p class="eyebrow">DripHub members</p><h1>Your style,<br><em>all in one place.</em></h1><p>Save your cart, move through checkout faster, and keep every order within reach.</p></div>
+      <span class="auth-visual-index">DH / 01</span>
     </div>
     <div class="auth-panel">
       <div class="auth-panel-inner">
@@ -59,7 +59,7 @@ async function submit() {
           <label class="remember-row"><input v-model="remember" type="checkbox" /><span>Keep me signed in on this device</span></label>
           <button class="auth-submit" type="submit" :disabled="submitting"><span>{{ submitting ? 'Signing you in…' : 'Log in' }}</span><b>&rarr;</b></button>
         </form>
-        <p class="auth-switch">New to Maps Kayz? <router-link :to="{ path: '/register', query: route.query }">Create an account</router-link></p>
+        <p class="auth-switch">New to DripHub? <router-link :to="{ path: '/register', query: route.query }">Create an account</router-link></p>
         <p class="auth-note">Protected by secure, encrypted authentication.</p>
       </div>
     </div>

@@ -75,7 +75,7 @@ function subscribe() {
 
 <template>
   <section class="hero">
-    <img src="https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=1800&q=90" alt="Maps Kayz fashion campaign" />
+    <img src="https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=1800&q=90" alt="DripHub fashion campaign" />
     <div class="hero-shade"></div>
     <div class="hero-copy">
       <p class="eyebrow">The signature edit &middot; 2026</p>
@@ -150,7 +150,7 @@ function subscribe() {
       <img src="https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=1200&q=88" alt="A considered formal outfit" />
     </div>
     <div class="look-copy">
-      <span class="look-number">MK <small>05</small></span>
+      <span class="look-number">DH <small>05</small></span>
       <p class="eyebrow">Your wardrobe, considered</p>
       <h2>Complete <em>the look.</em></h2>
       <p>Build a head-to-toe outfit in a few thoughtful steps. Choose your foundation, refine every detail, and finish with a signature scent.</p>

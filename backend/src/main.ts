@@ -27,7 +27,7 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Maps Kayz Fashions API')
+    .setTitle('DripHub Fashions API')
     .setDescription('Backend for online fashion commerce platform')
     .setVersion('1.0')
     .addBearerAuth()

@@ -1,4 +1,4 @@
-# Deploying Maps Kayz Fashions
+# Deploying DripHub Fashions
 
 **Live backend**: `https://maps-kayz-backend.onrender.com`
 
@@ -254,7 +254,7 @@ parked rather than active). To switch to it:
 1. Paste into [Cloud Shell](https://console.cloud.google.com) (no local
    `gcloud` install needed) or a local install:
    ```sh
-   gcloud projects create maps-kayz-fashions --name="Maps Kayz Fashions"
+   gcloud projects create maps-kayz-fashions --name="DripHub Fashions"
    gcloud config set project maps-kayz-fashions
    gcloud billing accounts list
    gcloud billing projects link maps-kayz-fashions --billing-account=YOUR_BILLING_ACCOUNT_ID

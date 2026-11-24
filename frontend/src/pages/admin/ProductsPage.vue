@@ -17,7 +17,7 @@ const formError = ref('')
 const confirmingDeleteId = ref(null)
 
 function emptyForm() {
-  return { name: '', sku: '', category: '', brand: 'Maps Kayz', price: '', originalPrice: '', stock: '', isFeatured: false, colours: '', sizes: '', description: '', imageUrl: '' }
+  return { name: '', sku: '', category: '', brand: 'DripHub', price: '', originalPrice: '', stock: '', isFeatured: false, colours: '', sizes: '', description: '', imageUrl: '' }
 }
 const form = ref(emptyForm())
 
