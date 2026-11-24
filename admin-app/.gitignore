@@ -1,0 +1,13 @@
+node_modules/
+node_modules.incomplete*/
+.expo/
+dist/
+dist-android/
+web-build/
+.env
+.env.local
+*.jks
+*.keystore
+*.p8
+*.p12
+*.mobileprovision

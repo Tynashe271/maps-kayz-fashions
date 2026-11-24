@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "Maps Kayz Admin",
+    "slug": "maps-kayz-admin",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#070707",
+    "primaryColor": "#f2a8c4",
+    "icon": "./assets/icon.png",
+    "android": {
+      "package": "zw.co.tinashenyenyesa.mapskayz.admin",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#070707"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "zw.co.tinashenyenyesa.mapskayz.admin",
+      "buildNumber": "1",
+      "supportsTablet": true
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/icon.png"
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#070707"
+        }
+      ]
+    ],
+    "extra": {
+      "adminUrl": "https://maps-kayz-admin.pages.dev/"
+    },
+    "owner": "tinashenyenyesa"
+  }
+}
