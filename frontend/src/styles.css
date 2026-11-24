@@ -467,3 +467,8 @@ html.mobile-app-embedded .cart-page,html.mobile-app-embedded .auth-page{padding-
   .header-actions>a,.header-actions>a:first-child,.header-actions .text-button{padding:0 5px;font-size:9px}
   .hero h1{font-size:38px}
 }
+
+/* DripHub wordmark logo (replaces the monogram + text lockup) */
+.brand-wordmark{display:block;height:46px;width:auto;max-width:100%}
+footer .brand-wordmark{height:40px}
+@media(max-width:600px){.brand-wordmark{height:34px}footer .brand-wordmark{height:34px}}
