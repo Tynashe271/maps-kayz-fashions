@@ -22,6 +22,9 @@ export class WebhooksService {
   // the check is skipped for local development.
   private verifySecret(provided: string | undefined, envVar: string) {
     const expected = process.env[envVar];
+    // Fail closed in production: an unset secret must never leave the
+    // endpoint open to anyone who can guess an order number.
+    if (!expected && process.env.NODE_ENV === 'production') throw new UnauthorizedException('Webhook secret not configured');
     if (expected && provided !== expected) throw new UnauthorizedException('Invalid webhook signature');
   }
 

@@ -154,11 +154,11 @@ export const api = {
   listLowStock: () => request('/operations/inventory/low-stock', { auth: true }),
 
   // ---- suppliers + supplier-product links (generic /platform/:resource CRUD) ----
-  listSuppliers: () => request('/platform/suppliers'),
+  listSuppliers: () => request('/platform/suppliers', { auth: true }),
   createSupplier: (dto) => request('/platform/suppliers', { method: 'POST', body: { reference: `supplier:${Date.now()}`, data: dto }, auth: true }),
   updateSupplier: (id, dto) => request(`/platform/suppliers/${id}`, { method: 'PATCH', body: { data: dto }, auth: true }),
   deleteSupplier: (id) => request(`/platform/suppliers/${id}`, { method: 'DELETE', auth: true }),
-  listSupplierProductMappings: () => request('/platform/supplier-product-mappings'),
+  listSupplierProductMappings: () => request('/platform/supplier-product-mappings', { auth: true }),
   // One mapping per product — reference is the product id, so this looks
   // for an existing record first and updates it instead of creating a
   // second mapping for the same product (the DB enforces (resource,
@@ -171,10 +171,10 @@ export const api = {
   },
 
   // ---- platform: generic flexible-resource CRUD (GET/detail public; write staff-only) ----
-  platformSummary: () => request('/platform/summary'),
+  platformSummary: () => request('/platform/summary', { auth: true }),
   platformCapabilities: () => request('/platform/capabilities'),
-  listPlatformRecords: (resource) => request(`/platform/${resource}`),
-  getPlatformRecord: (resource, id) => request(`/platform/${resource}/${id}`),
+  listPlatformRecords: (resource) => request(`/platform/${resource}`, { auth: true }),
+  getPlatformRecord: (resource, id) => request(`/platform/${resource}/${id}`, { auth: true }),
   createPlatformRecord: (resource, dto) => request(`/platform/${resource}`, { method: 'POST', body: dto, auth: true }),
   updatePlatformRecord: (resource, id, dto) => request(`/platform/${resource}/${id}`, { method: 'PATCH', body: dto, auth: true }),
   deletePlatformRecord: (resource, id) => request(`/platform/${resource}/${id}`, { method: 'DELETE', auth: true }),

@@ -12,15 +12,18 @@ export class PlatformController {
   constructor(private readonly platform: PlatformService) {}
 
   @Get('summary')
+  @UseGuards(JwtAuthGuard, StaffGuard)
   summary() { return this.platform.summary(); }
 
   @Get('capabilities')
   capabilities() { return PLATFORM_CAPABILITIES; }
 
   @Get(':resource')
+  @UseGuards(JwtAuthGuard, StaffGuard)
   list(@Param('resource') resource: string) { return this.platform.list(resource); }
 
   @Get(':resource/:id')
+  @UseGuards(JwtAuthGuard, StaffGuard)
   findOne(@Param('resource') resource: string, @Param('id') id: string) { return this.platform.findOne(resource, id); }
 
   @Post(':resource')
