@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 150" role="img" aria-label="DripHub Administration">
   <defs><linearGradient id="a" x1="10" y1="5" x2="140" y2="145" gradientUnits="userSpaceOnUse"><stop stop-color="#f8c6d8"/><stop offset="1" stop-color="#e58aaf"/></linearGradient></defs>
   <path d="M75 5 137 28v46c0 37-23 62-62 74C36 136 13 111 13 74V28L75 5Z" fill="#0b0a08" stroke="url(#a)" stroke-width="3"/>
-  <path d="M44 102V49h10l21 31 21-31h10v53H95V69L75 96 55 69v33H44Z" fill="#f7f2ea"/>
+  <path fill-rule="evenodd" d="M46 49h27c17 0 29 10 29 26.5S90 102 73 102H46V49ZM57 59v33h15c10 0 17-6.5 17-16.5S82 59 72 59H57Z" fill="#f7f2ea"/>
   <circle cx="75" cy="25" r="4" fill="#f2a8c4"/>
   <text x="170" y="72" font-family="Georgia,serif" font-size="38" letter-spacing="3" fill="#f7f2ea">DRIPHUB</text>
   <path d="M171 88h375" stroke="#f2a8c4" opacity=".38"/>
